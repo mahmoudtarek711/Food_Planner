@@ -13,6 +13,6 @@ public class LoginUseCase {
      */
     public boolean execute(String email, String password) {
         // Fake login logic (replace with API later)
-        return email.equals("test@email.com") && password.equals("123456");
+        return email.equals("mahmoudcr7m10@gmail.com") && password.equals("123456");
     }
 }
