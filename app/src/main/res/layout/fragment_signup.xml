@@ -11,7 +11,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="360dp"
-        android:layout_height="512dp"
+        android:layout_height="700dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,54 +21,128 @@
         app:cardBackgroundColor="@color/white"
         app:cardUseCompatPadding="true"
         app:cardPreventCornerOverlap="true"
+
         >
 
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="690dp"
             android:layout_gravity="center"
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/login_img"
+                android:id="@+id/addperson"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
                 android:background="@drawable/themebg"
-                android:src="@drawable/login"
-                />
+                android:src="@drawable/login" />
 
             <TextView
-                android:id="@+id/welcome_txt"
+                android:id="@+id/create_account_txt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:fontFamily="@font/roboto_bold"
-                android:textColor="@color/black"
-                android:text="@string/welcoming"
-                android:textAlignment="center"
                 android:layout_marginTop="10dp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/create_account"
+                android:textAlignment="center"
                 android:textSize="@dimen/text_size_xlarge" />
 
             <TextView
-                android:id="@+id/signin_request_txt"
+                android:id="@+id/simi_slogan_txt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="@string/signin_request"
+                android:text="@string/simi_slogan"
                 android:textAlignment="center"
                 android:textSize="@dimen/text_size_regular" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_marginTop="5dp"
-                android:layout_gravity="center"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_signup_gmail"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/themeoffwhite"
+                android:text="@string/signup_via_google"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_regular"
+                app:iconTint="@null"
+                app:backgroundTint="@color/white"
+                app:icon="@drawable/google_icon"
+                app:iconGravity="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_signup_facebook"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:textColor="@color/white"
+                android:background="@drawable/themefbblue"
+                android:text="@string/signup_via_fb"
+                android:textSize="@dimen/text_size_regular"
+                app:backgroundTint="@color/fbblue"
+                app:iconTint="@color/white"
+                app:icon="@drawable/fb"
+                app:iconGravity="textStart" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_signup_ticktok"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/themeblack"
+                android:text="@string/signup_via_tiktok"
+                android:textSize="@dimen/text_size_regular"
+                app:backgroundTint="@color/black"
+                app:iconTint="@color/white"
+                app:icon="@drawable/logo_tiktok"
+                app:iconGravity="textStart" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:hint="@string/fullname"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxStrokeColor="@color/primary"
+                app:hintEnabled="true"
+                app:hintTextColor="@color/black"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/fullname_input_signup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
+                    android:textColorHighlight="@color/black"
+                    android:textCursorDrawable="@drawable/cursor_primary"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
                 android:hint="@string/email"
                 app:boxBackgroundMode="outline"
                 app:boxCornerRadiusBottomEnd="12dp"
@@ -81,15 +155,11 @@
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/email_input_login"
+                    android:id="@+id/email_input_signup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColorHint="@color/black"
-                    android:textColor="@color/black"
-                    android:textColorHighlight="@color/black"
                     android:inputType="textEmailAddress"
                     android:textCursorDrawable="@drawable/cursor_primary"
-
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -110,7 +180,7 @@
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password_input_login"
+                    android:id="@+id/password_input_signup"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -122,27 +192,17 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_login"
+                android:id="@+id/btn_signup"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:text="@string/signin"
                 android:textColor="@color/white"
-                app:backgroundTint="@color/primary"
                 android:background="@drawable/themebg"
+                app:backgroundTint="@color/primary"
+                android:text="@string/sign"
                 android:textSize="@dimen/text_size_regular" />
 
-            <Button
-                android:id="@+id/btn_login_as_guest"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="#F5F5F5"
-                android:textColor="@color/black"
-                android:text="@string/login_as_a_guest"
-                android:textSize="@dimen/text_size_regular" />
 
             <TextView
                 android:id="@+id/dont_have_account_txt"
@@ -152,19 +212,19 @@
                 android:textColor="@color/black"
                 android:layout_marginTop="15dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="@string/dont_have_an_account"
+                android:text="@string/already_have_acc"
                 android:textAlignment="center"
                 android:textSize="@dimen/text_size_regular" />
 
             <TextView
-                android:id="@+id/signup_now_txt_btn"
+                android:id="@+id/signin_txt_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
                 android:clickable="true"
                 android:fontFamily="@font/roboto_bold"
-                android:text="@string/signup"
+                android:text="@string/signin"
                 android:textAlignment="center"
                 android:textColor="@color/primary"
                 android:textSize="@dimen/text_size_regular"
