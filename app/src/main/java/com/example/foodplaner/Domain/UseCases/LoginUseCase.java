@@ -6,7 +6,6 @@ package com.example.foodplaner.Domain.UseCases;
  * (Login user)
  */
 public class LoginUseCase {
-//////////////////////////////////
     /**
      * Executes login logic
      * @return true if login success
