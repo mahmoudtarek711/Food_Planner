@@ -1,0 +1,13 @@
+<resources>
+    <!-- Small text -->
+    <dimen name="text_size_small">12sp</dimen>
+
+    <!-- Regular / body text -->
+    <dimen name="text_size_regular">16sp</dimen>
+
+    <!-- Large / headings -->
+    <dimen name="text_size_large">20sp</dimen>
+
+    <!-- Extra large / title -->
+    <dimen name="text_size_xlarge">24sp</dimen>
+</resources>

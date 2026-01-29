@@ -1,5 +1,13 @@
 <resources>
-    <string name="app_name">Food Planer</string>
+    <string name="app_name">ForkFlow</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="welcoming">Welcome Back</string>
+    <string name="signin_request">Sign in to your Food Planner account</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="signin">Sign In</string>
+    <string name="login_as_a_guest">Continue as guest</string>
+    <string name="dont_have_an_account">Dont have an account ?</string>
+    <string name="signup">Sign Up now</string>
 </resources>
