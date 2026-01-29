@@ -10,4 +10,12 @@
     <string name="login_as_a_guest">Continue as guest</string>
     <string name="dont_have_an_account">Dont have an account ?</string>
     <string name="signup">Sign Up now</string>
+    <string name="create_account">Create Account</string>
+    <string name="simi_slogan">Start planning your meals today</string>
+    <string name="fullname">Full Name</string>
+    <string name="sign">Sign Up</string>
+    <string name="already_have_acc">Already have an account ?</string>
+    <string name="signup_via_fb">Sign Up with Facebook</string>
+    <string name="signup_via_google">Sign Up with Google</string>
+    <string name="signup_via_tiktok">Sign Up with TikTok</string>
 </resources>
