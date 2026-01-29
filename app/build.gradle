@@ -31,6 +31,21 @@ android {
 }
 
 dependencies {
+    implementation "com.airbnb.android:lottie:6.1.0"
+    implementation libs.fragment
+    def nav_version = "2.9.7"
+
+    // Jetpack Compose Integration
+    implementation "androidx.navigation:navigation-compose:$nav_version"
+
+    // Views/Fragments Integration
+    implementation "androidx.navigation:navigation-fragment:$nav_version"
+    implementation "androidx.navigation:navigation-ui:$nav_version"
+
+    // Feature module support for Fragments
+    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+
+
     implementation 'com.google.android.material:material:1.12.0'
     implementation libs.appcompat
     implementation libs.material
