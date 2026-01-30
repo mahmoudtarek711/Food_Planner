@@ -78,6 +78,7 @@ public class SplashScreenFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         lottieAnimationView = view.findViewById(R.id.splash_lottie);
         lottieAnimationView.playAnimation();
+        lottieAnimationView.setSpeed(5);
         lottieAnimationView.addAnimatorListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationCancel(@NonNull Animator animator) {
@@ -97,6 +98,12 @@ public class SplashScreenFragment extends Fragment {
 
             @Override
             public void onAnimationStart(@NonNull Animator animator) {
+                lottieAnimationView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        lottieAnimationView.cancelAnimation();
+                    }
+                });
 
             }
         });
