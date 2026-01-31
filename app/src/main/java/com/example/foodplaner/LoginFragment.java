@@ -22,6 +22,8 @@ import android.widget.TextView;
  */
 public class LoginFragment extends Fragment {
     TextView signupButton;
+    Button login;
+    Button loginAsGuest;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -91,5 +93,21 @@ public class LoginFragment extends Fragment {
                                 .navigateUp();
                     }
                 });
+        login = view.findViewById(R.id.btn_login);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(LoginFragment.this)
+                        .navigate(R.id.action_loginFragment_to_homeFragment);
+            }
+        });
+        loginAsGuest =  view.findViewById(R.id.btn_login_as_guest);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(LoginFragment.this)
+                        .navigate(R.id.action_loginFragment_to_homeFragment);
+            }
+        });
     }
 }

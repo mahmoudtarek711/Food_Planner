@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="top_nav_bg">
+        <item name="cornerFamily">rounded</item>
+
+        <!-- TOP = flat -->
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+
+        <!-- BOTTOM = rounded -->
+        <item name="cornerSizeBottomLeft">28dp</item>
+        <item name="cornerSizeBottomRight">28dp</item>
+    </style>
+</resources>

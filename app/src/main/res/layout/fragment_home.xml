@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".HomeFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
+        android:layout_width="match_parent"
+
+        android:layout_height="225dp"
+        app:cardBackgroundColor="@color/primary"
+
+        app:cardElevation="4dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/top_nav_bg">
+
+        <include
+            android:id="@+id/top_bar_view"
+            layout="@layout/top_bar_welcomming_logout"></include>
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/meal_of_the_day_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:drawableStart="@drawable/star_shine"
+        android:drawablePadding="10dp"
+        android:text="@string/meal_of_the_day"
+        android:textSize="@dimen/text_size_xlarge"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_marginTop="10dp"
+        android:id="@+id/materialCardView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        app:cardBackgroundColor="@color/background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/meal_of_the_day_txt">
+
+        <include
+            layout="@layout/meal_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></include>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/suggested_for_u_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:drawableStart="@drawable/trending_up"
+        android:drawablePadding="10dp"
+        android:text="@string/suggested_for_u"
+        android:textSize="@dimen/text_size_xlarge"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/materialCardView2" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/meals_recycler_view"
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/suggested_for_u_txt"
+        tools:listitem="@layout/meal_card_view"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp"
+        android:nestedScrollingEnabled="false"
+        tools:itemCount="7"
+        app:spanCount="2"
+        ></androidx.recyclerview.widget.RecyclerView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

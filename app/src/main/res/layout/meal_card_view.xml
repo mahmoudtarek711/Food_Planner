@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:paddingBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="12"
+        android:orientation="vertical"
+        >
+        <FrameLayout
+            android:layout_weight="6"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageView
+                android:id="@+id/meal_img"
+                android:layout_width="match_parent"
+                android:layout_height="184dp"
+                android:scaleType="fitXY"
+                tools:srcCompat="@drawable/burger" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/meal_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="12dp"
+            android:text="@string/meal_name"
+            android:textSize="@dimen/text_size_xlarge"
+            tools:text="Smash Burger" />
+
+        <TextView
+            android:id="@+id/meal_og"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/trending_up"
+            android:drawablePadding="10dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/roboto"
+            android:text="@string/meal_org"
+            android:textSize="@dimen/text_size_large"
+            tools:text="USA" />
+
+        <TextView
+            android:id="@+id/meal_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/roboto"
+            android:text="@string/meal_desc"
+            android:textSize="@dimen/text_size_large"
+            tools:text="A delicious smash burger with carameled onion and melty cheese"></TextView>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

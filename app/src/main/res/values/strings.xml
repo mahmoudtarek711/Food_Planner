@@ -18,4 +18,13 @@
     <string name="signup_via_fb">Sign Up with Facebook</string>
     <string name="signup_via_google">Sign Up with Google</string>
     <string name="signup_via_tiktok">Sign Up with TikTok</string>
+    <string name="welcome_back">Welcome Back ,</string>
+    <string name="client_name">Client Name</string>
+    <string name="logout">Log Out</string>
+    <string name="today_date">Today\'s Date</string>
+    <string name="meal_of_the_day">Meal of the Day</string>
+    <string name="meal_name">Meal Name</string>
+    <string name="meal_org">Meal Origin</string>
+    <string name="meal_desc">Meal Description</string>
+    <string name="suggested_for_u">Suggested For You</string>
 </resources>
