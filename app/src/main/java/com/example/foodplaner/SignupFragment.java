@@ -74,8 +74,7 @@ public class SignupFragment extends Fragment {
         signinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(SignupFragment.this)
-                        .navigate(R.id.action_signupFragment_to_loginFragment);
+                NavHostFragment.findNavController(SignupFragment.this).navigateUp();
             }
         });
     }
