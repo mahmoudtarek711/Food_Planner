@@ -2,6 +2,7 @@ package com.example.foodplaner;
 
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -80,5 +81,15 @@ public class LoginFragment extends Fragment {
                         .navigate(R.id.action_loginFragment_to_signupFragment);
             }
         });
+        requireActivity().getOnBackPressedDispatcher()
+                .addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        //Make Sure That The User Want To Exit The App
+
+                        NavHostFragment.findNavController(LoginFragment.this)
+                                .navigateUp();
+                    }
+                });
     }
 }

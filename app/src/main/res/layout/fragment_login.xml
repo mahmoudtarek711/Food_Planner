@@ -123,26 +123,19 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_login"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
                 android:text="@string/signin"
-                android:textColor="@color/white"
-                app:backgroundTint="@color/primary"
-                android:background="@drawable/themebg"
-                android:textSize="@dimen/text_size_regular" />
+                style="@style/PrimaryGradientButton"
+                />
 
             <Button
                 android:id="@+id/btn_login_as_guest"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:backgroundTint="#F5F5F5"
                 android:textColor="@color/black"
-                android:text="@string/login_as_a_guest"
-                android:textSize="@dimen/text_size_regular" />
+                style="@style/white_button_style"
+                android:backgroundTint="@color/gray"
+                android:text="@string/login_as_a_guest" />
 
             <TextView
                 android:id="@+id/dont_have_account_txt"

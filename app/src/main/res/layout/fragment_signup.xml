@@ -66,29 +66,19 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_signup_gmail"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/themeoffwhite"
+                style="@style/white_button_style"
                 android:text="@string/signup_via_google"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_regular"
                 app:iconTint="@null"
-                app:backgroundTint="@color/white"
                 app:icon="@drawable/google_icon"
                 app:iconGravity="textStart" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_signup_facebook"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:textColor="@color/white"
-                android:background="@drawable/themefbblue"
                 android:text="@string/signup_via_fb"
-                android:textSize="@dimen/text_size_regular"
+                style="@style/white_button_style"
+                android:textColor="@color/white"
                 app:backgroundTint="@color/fbblue"
                 app:iconTint="@color/white"
                 app:icon="@drawable/fb"
@@ -96,14 +86,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_signup_ticktok"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textColor="@color/white"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/themeblack"
                 android:text="@string/signup_via_tiktok"
-                android:textSize="@dimen/text_size_regular"
+                style="@style/white_button_style"
+                android:textColor="@color/white"
                 app:backgroundTint="@color/black"
                 app:iconTint="@color/white"
                 app:icon="@drawable/logo_tiktok"
@@ -193,15 +179,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_signup"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
                 android:textColor="@color/white"
-                android:background="@drawable/themebg"
-                app:backgroundTint="@color/primary"
-                android:text="@string/sign"
-                android:textSize="@dimen/text_size_regular" />
+                style="@style/PrimaryGradientButton"
+                android:text="@string/sign" />
 
 
             <TextView
