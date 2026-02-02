@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private MealsAdapter adapter;
-    private List<Meal> mealList;
+    private List<MealResponse> mealList;
     private Button logout;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -72,7 +73,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -86,12 +86,67 @@ public class HomeFragment extends Fragment {
 
         // Dummy data
         mealList = new ArrayList<>();
-        mealList.add(new Meal("Smash Burger", "USA", "A delicious smash burger with caramelized onion and melty cheese", R.drawable.burger));
-        mealList.add(new Meal("Veggie Pizza", "Italy", "Fresh veggie pizza with mozzarella and basil", R.drawable.burger));
-        mealList.add(new Meal("Sushi Platter", "Japan", "Assorted sushi with fresh fish", R.drawable.burger));
-        mealList.add(new Meal("Pasta Carbonara", "Italy", "Creamy pasta with pancetta", R.drawable.burger));
-        mealList.add(new Meal("Caesar Salad", "USA", "Crispy lettuce with Caesar dressing", R.drawable.burger));
-        mealList.add(new Meal("Tacos", "Mexico", "Spicy beef tacos with salsa", R.drawable.burger));
+
+        mealList.add(new MealResponse(
+                "Smash Burger",
+                "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
+                "USA",
+                Arrays.asList("Ground Beef", "Cheddar Cheese", "Buns", "Lettuce", "Tomato"),
+                Arrays.asList("200g", "2 slices", "2", "2 leaves", "2 slices"),
+                "Form beef into patties, cook on hot skillet. Assemble with cheese, lettuce, tomato, and buns.",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
+
+        mealList.add(new MealResponse(
+                "Veggie Pizza",
+                "https://www.themealdb.com/images/media/meals/x0lk931587671540.jpg",
+                "Italy",
+                Arrays.asList("Pizza Dough", "Tomato Sauce", "Mozzarella", "Bell Peppers", "Olives"),
+                Arrays.asList("1 base", "3 tbsp", "150g", "1 sliced", "10"),
+                "Spread tomato sauce on dough, add veggies and cheese, bake at 220°C for 12-15 mins.",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
+
+        mealList.add(new MealResponse(
+                "Sushi Platter",
+                "https://www.themealdb.com/images/media/meals/g046bb1663960946.jpg",
+                "Japan",
+                Arrays.asList("Sushi Rice", "Nori", "Salmon", "Avocado", "Cucumber"),
+                Arrays.asList("300g", "5 sheets", "200g", "1 sliced", "1 sliced"),
+                "Prepare sushi rice, cut fish and veggies, roll with nori, slice and serve.",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
+
+        mealList.add(new MealResponse(
+                "Pasta Carbonara",
+                "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg",
+                "Italy",
+                Arrays.asList("Spaghetti", "Eggs", "Parmesan", "Pancetta", "Black Pepper"),
+                Arrays.asList("200g", "2", "50g", "100g", "to taste"),
+                "Cook spaghetti. Fry pancetta. Mix eggs and parmesan. Combine with pasta off heat.",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
+
+        mealList.add(new MealResponse(
+                "Caesar Salad",
+                "https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg",
+                "USA",
+                Arrays.asList("Romaine Lettuce", "Croutons", "Parmesan", "Caesar Dressing", "Chicken"),
+                Arrays.asList("1 head", "1 cup", "50g", "3 tbsp", "200g"),
+                "Toss lettuce with dressing, add croutons, parmesan, and grilled chicken.",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
+
+        mealList.add(new MealResponse(
+                "Tacos",
+                "https://www.themealdb.com/images/media/meals/qtuwxu1468233098.jpg",
+                "Mexico",
+                Arrays.asList("Taco Shells", "Ground Beef", "Lettuce", "Cheese", "Salsa"),
+                Arrays.asList("6", "250g", "1 cup", "100g", "3 tbsp"),
+                "Cook beef with spices, fill taco shells with beef, lettuce, cheese, salsa.",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        ));
+
 
         adapter = new MealsAdapter(mealList);
         recyclerView.setAdapter(adapter);

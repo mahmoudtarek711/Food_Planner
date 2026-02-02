@@ -46,17 +46,6 @@
                 android:textColor="#666666"
                 android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/big_meal_desc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="The best burger you will ever have in your life, featuring caramelized onions and our secret sauce."
-                android:textColor="#444444"
-                android:textSize="14sp" />
-
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

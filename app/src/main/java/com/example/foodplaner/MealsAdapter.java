@@ -9,13 +9,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHolder> {
 
-    private List<Meal> meals;
+    private List<MealResponse> meals;
 
-    public MealsAdapter(List<Meal> meals) {
+    public MealsAdapter(List<MealResponse> meals) {
         this.meals = meals;
     }
 
@@ -29,11 +31,14 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
-        Meal meal = meals.get(position);
-        holder.mealName.setText(meal.getName());
-        holder.mealLocation.setText(meal.getLocation());
-        holder.mealDesc.setText(meal.getDescription());
-        holder.mealImg.setImageResource(meal.getImageResId());
+        MealResponse meal = meals.get(position);
+        holder.mealName.setText(meal.getStrMeal());
+        holder.mealLocation.setText(meal.getStrArea());
+        Glide.with(holder.itemView.getContext())
+                .load(meal.getStrMealThumb()) // URL
+                .placeholder(R.drawable.applogo) // optional
+                .error(R.drawable.ic_launcher_background)       // optional
+                .into(holder.mealImg);
     }
 
     @Override
@@ -43,14 +48,13 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
 
     public static class MealViewHolder extends RecyclerView.ViewHolder {
         ImageView mealImg;
-        TextView mealName, mealLocation, mealDesc;
+        TextView mealName, mealLocation;
 
         public MealViewHolder(@NonNull View itemView) {
             super(itemView);
             mealImg = itemView.findViewById(R.id.meal_img);
             mealName = itemView.findViewById(R.id.meal_name);
             mealLocation = itemView.findViewById(R.id.meal_og);
-            mealDesc = itemView.findViewById(R.id.meal_desc);
         }
     }
 }
