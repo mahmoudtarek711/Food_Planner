@@ -10,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -19,6 +20,7 @@ import android.widget.TextView;
  */
 public class SignupFragment extends Fragment {
     TextView signinButton;
+    Button signup;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,6 +77,14 @@ public class SignupFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 NavHostFragment.findNavController(SignupFragment.this).navigateUp();
+            }
+        });
+        signup = view.findViewById(R.id.btn_signup);
+        signup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(SignupFragment.this)
+                        .navigate(R.id.action_signupFragment_to_homeFragment);
             }
         });
     }
