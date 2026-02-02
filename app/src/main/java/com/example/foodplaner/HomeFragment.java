@@ -148,7 +148,12 @@ public class HomeFragment extends Fragment {
         ));
 
 
-        adapter = new MealsAdapter(mealList);
+        adapter = new MealsAdapter(mealList , meal -> {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("meal", meal);
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
+        });
         recyclerView.setAdapter(adapter);
 
 
@@ -162,4 +167,5 @@ public class HomeFragment extends Fragment {
         });
 
     }
+
 }

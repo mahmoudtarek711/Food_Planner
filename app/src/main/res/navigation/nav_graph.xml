@@ -56,5 +56,16 @@
         <action
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_mealDetailsFragment"
+            app:destination="@id/mealDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mealDetailsFragment"
+        android:name="com.example.foodplaner.MealDetailsFragment"
+        android:label="MealDetailsFragment" >
+        <argument
+            android:name="meal"
+            app:argType="com.example.foodplaner.MealResponse" />
     </fragment>
 </navigation>
