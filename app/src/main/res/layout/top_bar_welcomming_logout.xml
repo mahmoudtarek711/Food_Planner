@@ -45,6 +45,7 @@
         android:paddingTop="12dp"
         android:text=""
         app:icon="@drawable/login"
+        app:iconTint="@color/white"
         app:iconGravity="textTop"
         app:iconSize="@dimen/text_size_xlarge"
         app:layout_constraintEnd_toEndOf="parent"

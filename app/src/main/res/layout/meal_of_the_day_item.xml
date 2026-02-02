@@ -5,10 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp">
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,9 +15,9 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/meal_img"
+            android:id="@+id/big_meal_img"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="180dp"
             android:scaleType="centerCrop"
             android:src="@drawable/burger"
             tools:srcCompat="@drawable/burger" />
@@ -27,40 +26,37 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="16dp">
 
             <TextView
-                android:id="@+id/meal_name"
+                android:id="@+id/big_meal_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="Big Smash Burger"
                 android:textColor="@color/black"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textSize="18sp"
-                tools:text="Smash Burger" />
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/meal_og"
+                android:id="@+id/big_meal_og"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:drawableStart="@drawable/trending_up"
-                android:drawablePadding="8dp"
+                android:text="American Kitchen"
                 android:textColor="#666666"
-                android:textSize="14sp"
-                tools:text="USA" />
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/meal_desc"
+                android:id="@+id/big_meal_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textColor="#888888"
-                android:textSize="12sp"
-                android:maxLines="2"
                 android:ellipsize="end"
-                tools:text="A delicious smash burger with carameled onion and melty cheese" />
+                android:maxLines="2"
+                android:text="The best burger you will ever have in your life, featuring caramelized onions and our secret sauce."
+                android:textColor="#444444"
+                android:textSize="14sp" />
+
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
