@@ -1,6 +1,5 @@
-package com.example.foodplaner;
+package com.example.foodplaner.homescreen.view;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,19 +7,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.foodplaner.model.MealDTO;
+import com.example.foodplaner.R;
 
 import java.util.List;
 
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHolder> {
 
-    private List<MealResponse> meals;
+    private List<MealDTO> meals;
     private OnMealClickListener listener;
 
-    public MealsAdapter(List<MealResponse> meals,OnMealClickListener listener) {
+    public MealsAdapter(List<MealDTO> meals, OnMealClickListener listener) {
         this.listener = listener;
         this.meals = meals;
     }
@@ -35,7 +35,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
 
     @Override
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
-        MealResponse meal = meals.get(position);
+        MealDTO meal = meals.get(position);
         holder.mealName.setText(meal.getStrMeal());
         holder.mealLocation.setText(meal.getStrArea());
         Glide.with(holder.itemView.getContext())
@@ -68,7 +68,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         }
     }
     public interface OnMealClickListener {
-        void onMealClick(MealResponse meal);
+        void onMealClick(MealDTO meal);
     }
 }
 

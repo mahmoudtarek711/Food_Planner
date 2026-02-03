@@ -1,13 +1,14 @@
-package com.example.foodplaner;
+package com.example.foodplaner.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MealResponse implements Parcelable {
+public class MealDTO implements Parcelable {
 
     @SerializedName("idMeal")
     private String idMeal;
@@ -27,7 +28,10 @@ public class MealResponse implements Parcelable {
     @SerializedName("strYoutube")
     private String strYoutube;
 
-    // Ingredients & Measures
+    @SerializedName("strCategory")
+    private String strCategory;
+
+    // Ingredients
     @SerializedName("strIngredient1") private String strIngredient1;
     @SerializedName("strIngredient2") private String strIngredient2;
     @SerializedName("strIngredient3") private String strIngredient3;
@@ -49,6 +53,7 @@ public class MealResponse implements Parcelable {
     @SerializedName("strIngredient19") private String strIngredient19;
     @SerializedName("strIngredient20") private String strIngredient20;
 
+    // Measures
     @SerializedName("strMeasure1") private String strMeasure1;
     @SerializedName("strMeasure2") private String strMeasure2;
     @SerializedName("strMeasure3") private String strMeasure3;
@@ -70,39 +75,22 @@ public class MealResponse implements Parcelable {
     @SerializedName("strMeasure19") private String strMeasure19;
     @SerializedName("strMeasure20") private String strMeasure20;
 
-    // Lists
+    // Lists (lazy populated)
     private List<String> ingredients;
     private List<String> measures;
 
-    // ---------------- Constructor ----------------
-    public MealResponse() {
+    // ---------------- EMPTY CONSTRUCTOR (Gson needs this) ----------------
+    public MealDTO() {
+        // DO NOT populate here
+    }
+
+    // ---------------- LAZY BUILD ----------------
+    private void buildIngredientListsIfNeeded() {
+        if (ingredients != null && measures != null) return;
+
         ingredients = new ArrayList<>();
         measures = new ArrayList<>();
-        populateLists();
-    }
-    // ---------------- Full constructor ----------------
-    public MealResponse(String strMeal,
-                        String strMealThumb,
-                        String strArea,
-                        List<String> ingredients,
-                        List<String> measures,
-                        String strInstructions,
-                        String strYoutube) {
 
-        this.strMeal = strMeal;
-        this.strArea = strArea;
-        this.strMealThumb = strMealThumb;
-
-        // Make copies to avoid null pointer
-        this.ingredients = ingredients != null ? new ArrayList<>(ingredients) : new ArrayList<>();
-        this.measures = measures != null ? new ArrayList<>(measures) : new ArrayList<>();
-
-        this.strInstructions = strInstructions;
-        this.strYoutube = strYoutube;
-    }
-
-
-    private void populateLists() {
         addIfNotEmpty(strIngredient1, strMeasure1);
         addIfNotEmpty(strIngredient2, strMeasure2);
         addIfNotEmpty(strIngredient3, strMeasure3);
@@ -133,39 +121,41 @@ public class MealResponse implements Parcelable {
     }
 
     // ---------------- Parcelable ----------------
-    protected MealResponse(Parcel in) {
+    protected MealDTO(Parcel in) {
         idMeal = in.readString();
         strMeal = in.readString();
         strMealThumb = in.readString();
         strArea = in.readString();
         strInstructions = in.readString();
         strYoutube = in.readString();
-
+        strCategory = in.readString();
         ingredients = in.createStringArrayList();
         measures = in.createStringArrayList();
     }
 
-    public static final Creator<MealResponse> CREATOR = new Creator<MealResponse>() {
+    public static final Creator<MealDTO> CREATOR = new Creator<MealDTO>() {
         @Override
-        public MealResponse createFromParcel(Parcel in) {
-            return new MealResponse(in);
+        public MealDTO createFromParcel(Parcel in) {
+            return new MealDTO(in);
         }
 
         @Override
-        public MealResponse[] newArray(int size) {
-            return new MealResponse[size];
+        public MealDTO[] newArray(int size) {
+            return new MealDTO[size];
         }
     };
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        buildIngredientListsIfNeeded();
+
         dest.writeString(idMeal);
         dest.writeString(strMeal);
         dest.writeString(strMealThumb);
         dest.writeString(strArea);
         dest.writeString(strInstructions);
         dest.writeString(strYoutube);
-
+        dest.writeString(strCategory);
         dest.writeStringList(ingredients);
         dest.writeStringList(measures);
     }
@@ -181,6 +171,15 @@ public class MealResponse implements Parcelable {
     public String getStrArea() { return strArea; }
     public String getStrInstructions() { return strInstructions; }
     public String getStrYoutube() { return strYoutube; }
-    public List<String> getIngredients() { return ingredients; }
-    public List<String> getMeasures() { return measures; }
+    public String getStrCategory() { return strCategory; }
+
+    public List<String> getIngredients() {
+        buildIngredientListsIfNeeded();
+        return ingredients;
+    }
+
+    public List<String> getMeasures() {
+        buildIngredientListsIfNeeded();
+        return measures;
+    }
 }

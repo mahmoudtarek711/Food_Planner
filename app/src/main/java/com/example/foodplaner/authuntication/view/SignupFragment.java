@@ -1,4 +1,4 @@
-package com.example.foodplaner;
+package com.example.foodplaner.authuntication.view;
 
 import android.os.Bundle;
 
@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.foodplaner.R;
 
 /**
  * A simple {@link Fragment} subclass.
