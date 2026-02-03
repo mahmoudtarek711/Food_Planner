@@ -14,7 +14,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background"
-    tools:context=".HomeFragment">
+    tools:context=".homescreen.view.HomeFragment">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView"
@@ -64,6 +64,7 @@
         app:layout_constraintTop_toBottomOf="@+id/meal_of_the_day_txt">
 
         <include
+            android:id="@+id/mealOfTheDayLayout"
             layout="@layout/meal_of_the_day_item"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></include>

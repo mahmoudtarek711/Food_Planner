@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.foodplaner.LoginFragment"
+        android:name="com.example.foodplaner.authuntication.view.LoginFragment"
         android:label="LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_signupFragment"
@@ -36,7 +36,7 @@
     </fragment>
     <fragment
         android:id="@+id/signupFragment"
-        android:name="com.example.foodplaner.SignupFragment"
+        android:name="com.example.foodplaner.authuntication.view.SignupFragment"
         android:label="SignupFragment" >
         <action
             android:id="@+id/action_signupFragment_to_loginFragment"
@@ -50,7 +50,7 @@
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.foodplaner.HomeFragment"
+        android:name="com.example.foodplaner.homescreen.view.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -62,10 +62,10 @@
     </fragment>
     <fragment
         android:id="@+id/mealDetailsFragment"
-        android:name="com.example.foodplaner.MealDetailsFragment"
+        android:name="com.example.foodplaner.detailscreen.view.MealDetailsFragment"
         android:label="MealDetailsFragment" >
         <argument
             android:name="meal"
-            app:argType="com.example.foodplaner.MealResponse" />
+            app:argType="com.example.foodplaner.model.MealDTO" />
     </fragment>
 </navigation>

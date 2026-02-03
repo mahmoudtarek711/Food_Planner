@@ -1,4 +1,4 @@
-package com.example.foodplaner;
+package com.example.foodplaner.authuntication.view;
 
 import android.os.Bundle;
 
@@ -6,24 +6,31 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import com.example.foodplaner.R;
+import com.example.foodplaner.authuntication.presenter.LoginPresenter;
+import com.example.foodplaner.authuntication.presenter.LoginPresenterInterface;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LoginFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements LoginViewInterface {
+    LoginPresenterInterface presenter;
     TextView signupButton;
     Button login;
     Button loginAsGuest;
+    EditText emailEditText;
+    EditText passwordEditText;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -75,14 +82,17 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        emailEditText = view.findViewById(R.id.email_input_login);
+        passwordEditText = view.findViewById(R.id.password_input_login);
+
+        presenter = new LoginPresenter(this);
+
+
         signupButton = view.findViewById(R.id.signup_now_txt_btn);
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(LoginFragment.this)
-                        .navigate(R.id.action_loginFragment_to_signupFragment);
-            }
-        });
+        signupButton.setOnClickListener(view1 -> {presenter.navigateToSignup();});
+
         requireActivity().getOnBackPressedDispatcher()
                 .addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
                     @Override
@@ -93,21 +103,34 @@ public class LoginFragment extends Fragment {
                                 .navigateUp();
                     }
                 });
+
         login = view.findViewById(R.id.btn_login);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(LoginFragment.this)
-                        .navigate(R.id.action_loginFragment_to_homeFragment);
-            }
+        login.setOnClickListener(view1 -> {
+            String email = emailEditText.getText().toString();
+            String password = passwordEditText.getText().toString();
+            presenter.login(email, password);
         });
+
         loginAsGuest =  view.findViewById(R.id.btn_login_as_guest);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(LoginFragment.this)
-                        .navigate(R.id.action_loginFragment_to_homeFragment);
-            }
-        });
+        loginAsGuest.setOnClickListener(view1 -> {presenter.loginAsGuest();});
     }
+
+    @Override
+    public void navigateToSignup() {
+        NavHostFragment.findNavController(LoginFragment.this)
+                .navigate(R.id.action_loginFragment_to_signupFragment);
+    }
+
+    @Override
+    public void navigateToHome() {
+        NavHostFragment.findNavController(LoginFragment.this)
+                .navigate(R.id.action_loginFragment_to_homeFragment);
+    }
+
+    @Override
+    public void failLogin(String message) {
+        emailEditText.setError(message);
+        passwordEditText.setError(message);
+    }
+
 }

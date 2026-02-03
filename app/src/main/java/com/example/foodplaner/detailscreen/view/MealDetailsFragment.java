@@ -1,11 +1,10 @@
-package com.example.foodplaner;
+package com.example.foodplaner.detailscreen.view;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.foodplaner.R;
+import com.example.foodplaner.model.MealDTO;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
@@ -36,7 +37,7 @@ public class MealDetailsFragment extends Fragment {
     TextView steps;
     Button back_btn;
     Button add_to_calendar;
-    MealResponse meal;
+    MealDTO meal;
     ImageView meal_image;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -130,7 +131,7 @@ public class MealDetailsFragment extends Fragment {
             youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
                 @Override
                 public void onReady(@NonNull YouTubePlayer youTubePlayer) {
-                    String videoId = extractYoutubeId("https://www.youtube.com/watch?v=o8tz2BOltTg");
+                    String videoId = extractYoutubeId(meal.getStrYoutube());
                     youTubePlayer.cueVideo(videoId, 0);
 
                 }
@@ -140,7 +141,7 @@ public class MealDetailsFragment extends Fragment {
 
 
     }
-    private void setupIngredientsRecycler(MealResponse meal) {
+    private void setupIngredientsRecycler(MealDTO meal) {
         ing_rv.setLayoutManager(new LinearLayoutManager(getContext()));
         ing_rv.setNestedScrollingEnabled(false);
 
