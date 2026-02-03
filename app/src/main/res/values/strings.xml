@@ -27,4 +27,7 @@
     <string name="meal_org">Meal Origin</string>
     <string name="meal_desc">Meal Description</string>
     <string name="suggested_for_u">Suggested For You</string>
+    <string name="location">Location</string>
+    <string name="Ingredients">Ingredients</string>
+    <string name="steps">Steps</string>
 </resources>
