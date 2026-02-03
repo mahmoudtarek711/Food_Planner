@@ -31,7 +31,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String text = measures.get(position) + " of " + ingredients.get(position);
+        String text = measures.get(position) + " " + ingredients.get(position);
         holder.text.setText(text);
     }
 

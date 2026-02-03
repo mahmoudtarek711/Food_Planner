@@ -124,25 +124,19 @@ public class MealDetailsFragment extends Fragment {
                     .into(meal_image);
 
             setupIngredientsRecycler(meal);
-        }
-        // Inside onViewCreated...
-        YouTubePlayerView youtubePlayerView = view.findViewById(R.id.youtube_player_view);
-        getLifecycle().addObserver(youtubePlayerView);
+            YouTubePlayerView youTubePlayerView = view.findViewById(R.id.youtube_player_view);
+            getLifecycle().addObserver(youTubePlayerView);
 
-        // Extract ID and append your ?si parameter fix
-        String rawId = extractYoutubeId("https://youtu.be/rrsMEO5qw54?si=kFjX07JdNeopHIc-");
-        String videoIdWithSi = (rawId != null) ? rawId + "?si=j4sdf2ffh" : null;
+            youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+                @Override
+                public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                    String videoId = extractYoutubeId("https://www.youtube.com/watch?v=o8tz2BOltTg");
+                    youTubePlayer.cueVideo(videoId, 0);
 
-        Log.d("YOUTUBE_ID", "ID with parameter = " + videoIdWithSi);
-
-        youtubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
-            @Override
-            public void onReady(@NonNull YouTubePlayer youTubePlayer) {
-                if (videoIdWithSi != null) {
-                    youTubePlayer.cueVideo(videoIdWithSi, 0);
                 }
-            }
-        });
+            });
+        }
+
 
 
     }
