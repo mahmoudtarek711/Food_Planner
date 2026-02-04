@@ -96,51 +96,44 @@ public class HomeFragment extends Fragment implements ViewInterface {
         super.onViewCreated(view, savedInstanceState);
         presenter = new HomeScreenPresenter(this);
 
-        getParentFragmentManager().setFragmentResultListener(
-                "random_meal_key",
-                getViewLifecycleOwner(),
-                (key, bundle) -> {
-                    randomMeal = bundle.getParcelable("random_meal");
-                    if (randomMeal != null) {
-                        bindRandomMeal(randomMeal);
-                    }
-                }
-        );
-        if(randomMeal == null){
-            presenter.requestRandomMeal();
-        } else {
-            bindRandomMeal(randomMeal);
-        }
-        presenter.getAllMeals();
-
+        // 1. ALWAYS initialize your views first
         includeView = view.findViewById(R.id.mealOfTheDayLayout);
-
         mealImg = includeView.findViewById(R.id.big_meal_img);
         mealName = includeView.findViewById(R.id.big_meal_name);
         mealArea = includeView.findViewById(R.id.big_meal_og);
-
-        includeView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                presenter.navigateToMealDetails(randomMeal);
-            }
-        });
-
         recyclerView = view.findViewById(R.id.meals_recycler_view);
+        logout = view.findViewById(R.id.logout_btn);
 
-        // 2-column GridLayout
+        // Set up LayoutManager
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
+        // 2. Set up listeners
+        includeView.setOnClickListener(v -> presenter.navigateToMealDetails(randomMeal));
+        logout.setOnClickListener(v -> presenter.logoutUser());
 
+        // 3. Now check if we already have data (Back Stack navigation)
+        if (mealList != null && randomMeal != null) {
+            displayAllMeals(mealList);
+            bindRandomMeal(randomMeal);
+            return; // Data restored, stop here
+        }
 
-        logout = view.findViewById(R.id.logout_btn);
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                        presenter.logoutUser();
-            }
-        });
+        // 4. Handle State Restoration (System kill) vs First Launch
+        if (savedInstanceState != null) {
+            mealList = savedInstanceState.getParcelableArrayList("MEALS_LIST");
+            randomMeal = savedInstanceState.getParcelable("RANDOM_MEAL");
 
+            if (mealList != null) displayAllMeals(mealList);
+            else presenter.getAllMeals();
+
+            if (randomMeal != null) bindRandomMeal(randomMeal);
+            else presenter.requestRandomMeal();
+
+        } else {
+            // Fresh launch
+            presenter.getAllMeals();
+            presenter.requestRandomMeal();
+        }
     }
 
     @Override
@@ -153,13 +146,6 @@ public class HomeFragment extends Fragment implements ViewInterface {
                 .placeholder(R.drawable.applogo) // optional
                 .error(R.drawable.ic_launcher_background)       // optional
                 .into(mealImg);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("random_meal", meal);
-
-        getParentFragmentManager().setFragmentResult("random_meal_key", bundle);
-
-
-        bindRandomMeal(meal);
     }
     private void bindRandomMeal(MealDTO meal) {
         mealName.setText(meal.getStrMeal());
@@ -174,6 +160,7 @@ public class HomeFragment extends Fragment implements ViewInterface {
 
     @Override
     public void displayAllMeals(List<MealDTO> meals) {
+        mealList = meals;
         adapter = new MealsAdapter(meals , meal -> {
             Bundle bundle = new Bundle();
             bundle.putParcelable("meal", meal);
@@ -201,4 +188,21 @@ public class HomeFragment extends Fragment implements ViewInterface {
         NavHostFragment.findNavController(this)
                 .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
     }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mealList != null) {
+            outState.putParcelableArrayList(
+                    "MEALS_LIST",
+                    new ArrayList<>(mealList)
+            );
+        }
+
+        if (randomMeal != null) {
+            outState.putParcelable("RANDOM_MEAL", randomMeal);
+        }
+    }
+
+
 }

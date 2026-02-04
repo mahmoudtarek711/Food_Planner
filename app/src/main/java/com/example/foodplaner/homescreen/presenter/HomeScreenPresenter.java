@@ -54,38 +54,31 @@ public class HomeScreenPresenter implements PresenterInterface {
     public void getAllMeals() {
         List<MealDTO> randomMeals = new ArrayList<>();
         int TOTAL_MEALS = 6;
+        final int[] completedCalls = {0}; // Track total attempts
 
         for (int i = 0; i < TOTAL_MEALS; i++) {
+            Network.getInstance().getRandomMeal().enqueue(new Callback<MealResponse>() {
+                @Override
+                public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
+                    completedCalls[0]++; // One call finished
+                    if (response.isSuccessful() && response.body() != null) {
+                        randomMeals.add(response.body().getMeals().get(0));
+                    }
 
-            Network.getInstance()
-                    .getRandomMeal()
-                    .enqueue(new Callback<MealResponse>() {
+                    // Update UI once all 6 attempts are done, even if some failed
+                    if (completedCalls[0] == TOTAL_MEALS) {
+                        view.displayAllMeals(randomMeals);
+                    }
+                }
 
-                        @Override
-                        public void onResponse(Call<MealResponse> call,
-                                               Response<MealResponse> response) {
-
-                            if (response.isSuccessful()
-                                    && response.body() != null
-                                    && response.body() != null) {
-
-                                MealDTO meal =
-                                        response.body().getMeals().get(0);
-
-                                randomMeals.add(meal);
-
-                                // Once we collected 6 meals → update UI
-                                if (randomMeals.size() == TOTAL_MEALS) {
-                                    view.displayAllMeals(randomMeals);
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<MealResponse> call, Throwable t) {
-                            // Handle failure
-                        }
-                    });
+                @Override
+                public void onFailure(Call<MealResponse> call, Throwable t) {
+                    completedCalls[0]++;
+                    if (completedCalls[0] == TOTAL_MEALS) {
+                        view.displayAllMeals(randomMeals);
+                    }
+                }
+            });
         }
     }
     @Override
