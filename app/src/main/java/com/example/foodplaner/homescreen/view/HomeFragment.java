@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -21,6 +22,8 @@ import com.example.foodplaner.homescreen.presenter.HomeScreenPresenter;
 import com.example.foodplaner.homescreen.presenter.PresenterInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.R;
+import androidx.core.view.WindowInsetsCompat;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +97,7 @@ public class HomeFragment extends Fragment implements ViewInterface {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         presenter = new HomeScreenPresenter(this);
 
         // 1. ALWAYS initialize your views first

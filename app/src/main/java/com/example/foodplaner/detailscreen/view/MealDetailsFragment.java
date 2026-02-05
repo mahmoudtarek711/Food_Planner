@@ -108,7 +108,8 @@ public class MealDetailsFragment extends Fragment {
         back_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavHostFragment.findNavController(MealDetailsFragment.this).navigateUp();
+                //NavHostFragment.findNavController(MealDetailsFragment.this).navigateUp();
+                NavHostFragment.findNavController(MealDetailsFragment.this).navigate(R.id.action_mealDetailsFragment_to_searchFragment);
             }
         });
 
