@@ -115,23 +115,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void getDummyMealData() {
-        Network.getInstance().getRandomMeal().enqueue(new Callback<MealResponse>() {
-            @Override
-            public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
-                mealAdapter = new MealsAdapter(response.body().getMeals(), meal -> {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("meal", meal);
-                    NavHostFragment.findNavController(SearchFragment.this)
-                            .navigate(R.id.action_searchFragment_to_mealDetailsFragment, bundle);
-                });
-                filteredMealRv.setAdapter(mealAdapter);
-            }
 
-            @Override
-            public void onFailure(Call<MealResponse> call, Throwable t) {
-
-            }
-        });
     }
 }
 

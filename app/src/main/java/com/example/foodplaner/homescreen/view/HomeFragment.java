@@ -1,5 +1,6 @@
 package com.example.foodplaner.homescreen.view;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,13 +16,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.example.foodplaner.MainActivity;
 import com.example.foodplaner.homescreen.presenter.HomeScreenPresenter;
 import com.example.foodplaner.homescreen.presenter.PresenterInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.R;
+import com.example.foodplaner.repository.RepositoryImp;
+import com.google.android.material.snackbar.Snackbar;
+
 import androidx.core.view.WindowInsetsCompat;
 
 
@@ -40,12 +51,16 @@ public class HomeFragment extends Fragment implements ViewInterface {
     private List<MealDTO> mealList;
     private Button logout;
     private MealDTO randomMeal;
+    RepositoryImp repository;
 
     View includeView ;
 
     ImageView mealImg ;
     TextView mealName ;
     TextView mealArea;
+    private View contentLayout;
+    private ProgressBar progressBar;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -97,8 +112,11 @@ public class HomeFragment extends Fragment implements ViewInterface {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        contentLayout = view.findViewById(R.id.home_scroll_view);
+        progressBar = view.findViewById(R.id.progressBar);
 
-        presenter = new HomeScreenPresenter(this);
+        repository = new RepositoryImp();
+        presenter = new HomeScreenPresenter(this,repository);
 
         // 1. ALWAYS initialize your views first
         includeView = view.findViewById(R.id.mealOfTheDayLayout);
@@ -119,24 +137,34 @@ public class HomeFragment extends Fragment implements ViewInterface {
         if (mealList != null && randomMeal != null) {
             displayAllMeals(mealList);
             bindRandomMeal(randomMeal);
+            progressBar.setVisibility(View.GONE);
+            contentLayout.setVisibility(View.VISIBLE);
             return; // Data restored, stop here
+        }else
+        {
+            progressBar.setVisibility(View.VISIBLE);
+            contentLayout.setVisibility(View.GONE);
         }
 
         // 4. Handle State Restoration (System kill) vs First Launch
         if (savedInstanceState != null) {
             mealList = savedInstanceState.getParcelableArrayList("MEALS_LIST");
             randomMeal = savedInstanceState.getParcelable("RANDOM_MEAL");
+            if (mealList != null && randomMeal != null) {
+                progressBar.setVisibility(View.GONE);
+                contentLayout.setVisibility(View.VISIBLE);
+            }
 
             if (mealList != null) displayAllMeals(mealList);
-            else presenter.getAllMeals();
+            else presenter.getAllMeals(false);
 
             if (randomMeal != null) bindRandomMeal(randomMeal);
-            else presenter.requestRandomMeal();
+            else presenter.requestRandomMeal(false);
 
         } else {
             // Fresh launch
-            presenter.getAllMeals();
-            presenter.requestRandomMeal();
+            presenter.getAllMeals(false);
+            presenter.requestRandomMeal(false);
         }
     }
 
@@ -192,6 +220,25 @@ public class HomeFragment extends Fragment implements ViewInterface {
         NavHostFragment.findNavController(this)
                 .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
     }
+
+    @Override
+    public void showError(String error) {
+        Snackbar.make(requireView(), "Error In Fetching Data...", Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onProssessing() {
+        progressBar.setVisibility(View.VISIBLE);
+        contentLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onProcessingEnd() {
+
+        progressBar.setVisibility(View.GONE);
+        contentLayout.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
