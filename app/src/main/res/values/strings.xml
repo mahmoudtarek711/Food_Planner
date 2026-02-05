@@ -30,4 +30,10 @@
     <string name="location">Location</string>
     <string name="Ingredients">Ingredients</string>
     <string name="steps">Steps</string>
+    <string name="country">Country</string>
+    <string name="category">Category</string>
+    <string name="ingredient">Ingredient</string>
+    <string name="name">Name</string>
+    <string name="search_meals">Find Your Meals</string>
+    <string name="search_bar_text">Search For Meals ....</string>
 </resources>

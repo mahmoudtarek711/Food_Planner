@@ -67,5 +67,21 @@
         <argument
             android:name="meal"
             app:argType="com.example.foodplaner.model.MealDTO" />
+        <action
+            android:id="@+id/action_mealDetailsFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.foodplaner.searchscreen.view.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_mealDetailsFragment"
+            app:destination="@id/mealDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.example.foodplaner.calendarscreen.view.calendarFragment"
+        android:label="calendarFragment" />
 </navigation>
