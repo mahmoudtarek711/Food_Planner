@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.foodplaner.R;
 import com.example.foodplaner.model.MealDTO;
+import com.google.android.material.snackbar.Snackbar;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
@@ -100,16 +101,13 @@ public class MealDetailsFragment extends Fragment {
         add_to_calendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(requireContext(),
-                        name.getText().toString() + " Meal Added",
-                        Toast.LENGTH_LONG).show();
+                Snackbar.make(view, name.getText().toString() + " Added to favorites", Snackbar.LENGTH_SHORT).show();
             }
         });
         back_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //NavHostFragment.findNavController(MealDetailsFragment.this).navigateUp();
-                NavHostFragment.findNavController(MealDetailsFragment.this).navigate(R.id.action_mealDetailsFragment_to_searchFragment);
+                NavHostFragment.findNavController(MealDetailsFragment.this).navigateUp();
             }
         });
 
