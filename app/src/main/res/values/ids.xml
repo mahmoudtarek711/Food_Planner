@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="country_chip" type="id">country_chip</item>
+    <item name="category_chip" type="id">category_chip</item>
+    <item name="ingredients_chip" type="id">ingredients_chip</item>
+</resources>
