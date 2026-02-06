@@ -5,12 +5,14 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ import com.google.android.material.chip.ChipGroup;
  * create an instance of this fragment.
  */
 public class SearchFragment extends Fragment implements ViewInterface{
+    SearchView searchView;
     AdapterSelection adapterSelection;
     private RecyclerView selectionRv, filteredMealRv;
     private MealsAdapter mealAdapter;
@@ -77,6 +80,8 @@ public class SearchFragment extends Fragment implements ViewInterface{
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        repository = new RepositoryImp();
+        presenter = new SearchScreenPresenter(repository,this);
     }
 
     @Override
@@ -89,11 +94,9 @@ public class SearchFragment extends Fragment implements ViewInterface{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        repository = new RepositoryImp();
-        presenter = new SearchScreenPresenter(repository,this);
         selectionRv = view.findViewById(R.id.selection_rv);
         filteredMealRv = view.findViewById(R.id.filtered_meal_rv);
-
+        searchView = view.findViewById(R.id.search_view);
         chipGroup = view.findViewById(R.id.selectors_chip_group); // Make sure you have this ID in XML
 
         // 1. Setup Selection Adapter (First RV)
@@ -110,8 +113,8 @@ public class SearchFragment extends Fragment implements ViewInterface{
         selectionRv.setAdapter(adapterSelection);
 
         // 2. Setup Meals Adapter (Second RV)
-        mealAdapter = new MealsAdapter(new ArrayList<>(), meal -> {
-            // Navigate to details
+        mealAdapter = new MealsAdapter(new ArrayList<>(), meal -> {presenter.getFullMeal(meal.getStrMeal());
+
         });
         filteredMealRv.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         filteredMealRv.setAdapter(mealAdapter);
@@ -128,6 +131,24 @@ public class SearchFragment extends Fragment implements ViewInterface{
 
         // Default selection
         presenter.getListOfArea();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                presenter.searchMealsLocally(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                presenter.searchMealsLocally(newText);
+                return true;
+            }
+        });
+
 
     }
 
@@ -152,6 +173,24 @@ public class SearchFragment extends Fragment implements ViewInterface{
     public void showAreas(List<Area> areas) {
         adapterSelection.setData(areas);
     }
+    @Override
+    public void showFullMeal(MealDTO meal) {
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("meal", meal);
+
+        NavHostFragment.findNavController(this)
+                .navigate(R.id.action_searchFragment_to_mealDetailsFragment, bundle);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        presenter.restoreState();
+
+    }
+
+
 }
 
 

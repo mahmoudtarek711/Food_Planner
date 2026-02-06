@@ -14,4 +14,9 @@ public interface PresenterInterface {
     void getListOfArea();
     void getListOfCatgories();
     void getListOfIngredients();
+    void getFullMeal(String mealName);
+    void searchMealsLocally(String query);
+    void getLocalSavedMeals(String query);
+    void restoreState();
+
 }

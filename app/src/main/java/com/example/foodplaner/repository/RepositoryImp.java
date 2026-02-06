@@ -56,4 +56,9 @@ public class RepositoryImp implements RepositoryInterface{
     public Observable<List<MealDTO>> filterByArea(String areaName) {
         return api.filterByArea(areaName).map(mealResponse -> mealResponse.getMeals());
     }
+
+    @Override
+    public Observable<MealDTO> getFullMeal(String mealName) {
+        return api.searchMealByName(mealName).map(mealResponse -> mealResponse.getMeals().get(0));
+    }
 }

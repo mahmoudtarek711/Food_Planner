@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:paddingBottom="110dp"
+    android:clipToPadding="false"
+    android:background="@color/background"
+    >
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -35,6 +39,7 @@
                 ></TextView>
 
             <SearchView
+                android:id="@+id/search_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -56,38 +61,46 @@
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:chipBackgroundColor="@color/accent"
+                    app:chipBackgroundColor="@color/chip_bg_state"
+                    android:textColor="@color/chip_text_state"
                     android:id="@+id/country_chip"
                     android:clickable="true"
                     android:checkable="true"
+                    android:checked="true"
                     android:text="@string/country"
                     ></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:chipBackgroundColor="@color/accent"
+                    app:chipBackgroundColor="@color/chip_bg_state"
+                    android:textColor="@color/chip_text_state"
                     android:id="@+id/category_chip"
                     android:clickable="true"
                     android:checkable="true"
+                    android:checked="false"
                     android:text="@string/category"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:chipBackgroundColor="@color/accent"
+                    app:chipBackgroundColor="@color/chip_bg_state"
+                    android:textColor="@color/chip_text_state"
                     android:id="@+id/ingredients_chip"
                     android:clickable="true"
                     android:checkable="true"
+                    android:checked="false"
                     android:text="@string/ingredient"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:chipBackgroundColor="@color/accent"
+                    app:chipBackgroundColor="@color/chip_bg_state"
+                    android:textColor="@color/chip_text_state"
                     android:id="@+id/name_chip"
                     android:clickable="true"
                     android:checkable="true"
+                    android:checked="false"
                     tools:text="@string/name"></com.google.android.material.chip.Chip>
 
             </com.google.android.material.chip.ChipGroup>
