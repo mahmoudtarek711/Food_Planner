@@ -5,38 +5,39 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bumptech.glide.Glide;
 import com.example.foodplaner.R;
 import com.example.foodplaner.homescreen.view.MealsAdapter;
+import com.example.foodplaner.model.Area;
+import com.example.foodplaner.model.Category;
+import com.example.foodplaner.model.Ingredient;
 import com.example.foodplaner.model.MealDTO;
-import com.example.foodplaner.model.MealResponse;
-import com.example.foodplaner.network.Network;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.foodplaner.repository.RepositoryImp;
+import com.example.foodplaner.searchscreen.presenter.PresenterInterface;
+import com.example.foodplaner.searchscreen.presenter.SearchScreenPresenter;
+import com.google.android.material.chip.ChipGroup;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SearchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements ViewInterface{
+    AdapterSelection adapterSelection;
     private RecyclerView selectionRv, filteredMealRv;
-    private SelectionAdapter selectionAdapter;
     private MealsAdapter mealAdapter;
+    RepositoryImp repository;
+    private ChipGroup chipGroup;
+    private PresenterInterface presenter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,91 +89,69 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        repository = new RepositoryImp();
+        presenter = new SearchScreenPresenter(repository,this);
         selectionRv = view.findViewById(R.id.selection_rv);
         filteredMealRv = view.findViewById(R.id.filtered_meal_rv);
 
-        // 1. Selection RV
-        selectionRv.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
-        selectionAdapter = new SelectionAdapter(getCountryImages());
-        selectionRv.setAdapter(selectionAdapter);
+        chipGroup = view.findViewById(R.id.selectors_chip_group); // Make sure you have this ID in XML
 
-        // 2. Filtered Meals RV
-        filteredMealRv.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-
-        // IMPORTANT: Call the method to actually fetch data!
-        getDummyMealData();
-    }
-
-    // Inside SearchFragment class
-    private List<Integer> getCountryImages() {
-        List<Integer> images = new ArrayList<>();
-        // Add your drawable resources here
-        images.add(R.drawable.brazil_flag);
-        images.add(R.drawable.brazil_flag); // Replace with your actual drawable names
-        images.add(R.drawable.brazil_flag);
-        images.add(R.drawable.brazil_flag);
-        return images;
-    }
-
-    private void getDummyMealData() {
-        Network.getInstance().getRandomMeal().enqueue(new Callback<MealResponse>() {
-            @Override
-            public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
-                mealAdapter = new MealsAdapter(response.body().getMeals(), meal -> {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable("meal", meal);
-                    NavHostFragment.findNavController(SearchFragment.this)
-                            .navigate(R.id.action_searchFragment_to_mealDetailsFragment, bundle);
-                });
-                filteredMealRv.setAdapter(mealAdapter);
-            }
-
-            @Override
-            public void onFailure(Call<MealResponse> call, Throwable t) {
-
+        // 1. Setup Selection Adapter (First RV)
+        adapterSelection = new AdapterSelection(new ArrayList<>(), item -> {
+            if (item instanceof Area) {
+                presenter.filterByCountry(((Area) item).getStrArea());
+            } else if (item instanceof Category) {
+                presenter.filterByCategory(((Category) item).getStrCategory());
+            } else if (item instanceof Ingredient) {
+                presenter.filterByIngredient(((Ingredient) item).getStrIngredient());
             }
         });
+        selectionRv.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        selectionRv.setAdapter(adapterSelection);
+
+        // 2. Setup Meals Adapter (Second RV)
+        mealAdapter = new MealsAdapter(new ArrayList<>(), meal -> {
+            // Navigate to details
+        });
+        filteredMealRv.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        filteredMealRv.setAdapter(mealAdapter);
+
+        // 3. Chip Selection Listener
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return;
+
+            int id = checkedIds.get(0);
+            if (id == R.id.country_chip) presenter.getListOfArea();
+            else if (id == R.id.category_chip) presenter.getListOfCatgories();
+            else if (id == R.id.ingredients_chip) presenter.getListOfIngredients();
+        });
+
+        // Default selection
+        presenter.getListOfArea();
+
+    }
+
+
+    @Override
+    public void showMeals(List<MealDTO> meals) {
+        mealAdapter.setList(meals); // You need a setList method in your MealsAdapter
+        mealAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showCategories(List<Category> categories) {
+        adapterSelection.setData(categories);
+    }
+
+    @Override
+    public void showIngredients(List<Ingredient> ingredients) {
+        adapterSelection.setData(ingredients);
+    }
+
+    @Override
+    public void showAreas(List<Area> areas) {
+        adapterSelection.setData(areas);
     }
 }
 
-class SelectionAdapter extends RecyclerView.Adapter<SelectionAdapter.SelectionViewHolder> {
-
-    private final List<Integer> selectionList; // Changed to Integer
-
-    public SelectionAdapter(List<Integer> selectionList) {
-        this.selectionList = selectionList;
-    }
-
-    @NonNull
-    @Override
-    public SelectionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.selection_img_cardview, parent, false);
-        return new SelectionViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull SelectionViewHolder holder, int position) {
-        int imageResId = selectionList.get(position);
-
-        Glide.with(holder.itemView.getContext())
-                .load(imageResId) // Loads the drawable ID
-                .placeholder(R.drawable.ic_launcher_background) // Optional placeholder
-                .into(holder.selectionImage);
-    }
-
-    @Override
-    public int getItemCount() {
-        return selectionList.size();
-    }
-
-    class SelectionViewHolder extends RecyclerView.ViewHolder {
-        ImageView selectionImage;
-
-        public SelectionViewHolder(@NonNull View itemView) {
-            super(itemView);
-            selectionImage = itemView.findViewById(R.id.cardImage);
-        }
-    }
-}
 

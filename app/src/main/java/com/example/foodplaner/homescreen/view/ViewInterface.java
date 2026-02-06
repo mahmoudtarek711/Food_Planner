@@ -10,4 +10,7 @@ public interface ViewInterface {
     void showMealDetails(String mealID);
     void showLogoutSuccess();
     void navigateToMealDetails(MealDTO meal);
+    void showError(String error);
+    void onProssessing();
+    void onProcessingEnd();
 }

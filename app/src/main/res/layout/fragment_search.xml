@@ -26,6 +26,7 @@
             >
 
             <TextView
+                android:paddingTop="50dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/search_meals"
@@ -49,12 +50,17 @@
                 android:layout_gravity="center"
                 app:singleSelection="true"
                 app:selectionRequired="true"
+                android:id="@+id/selectors_chip_group"
                 >
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:chipBackgroundColor="@color/accent"
+                    android:id="@+id/country_chip"
+
+                    android:clickable="true"
+                    android:checkable="true"
                     android:text="@string/country"
                     ></com.google.android.material.chip.Chip>
 
@@ -62,18 +68,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:chipBackgroundColor="@color/accent"
+                    android:id="@+id/category_chip"
+
+                    android:clickable="true"
+                    android:checkable="true"
                     android:text="@string/category"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:chipBackgroundColor="@color/accent"
+                    android:id="@+id/ingredients_chip"
+                    android:clickable="true"
+                    android:checkable="true"
                     android:text="@string/ingredient"></com.google.android.material.chip.Chip>
 
                 <com.google.android.material.chip.Chip
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:chipBackgroundColor="@color/accent"
+
+                    android:clickable="true"
+                    android:checkable="true"
                     tools:text="@string/name"></com.google.android.material.chip.Chip>
 
             </com.google.android.material.chip.ChipGroup>

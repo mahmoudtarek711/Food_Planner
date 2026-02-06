@@ -2,13 +2,31 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="160dp" android:layout_height="wrap_content"
+    android:id="@+id/country_cardview"
     android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="6dp">
-
-    <ImageView
-        android:id="@+id/cardImage"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/white"
+    >
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp" android:scaleType="centerCrop"
-        android:src="@drawable/brazil_flag" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white"
+        >
+        <ImageView
+            android:background="@color/white"
+            android:id="@+id/cardImage"
+            android:layout_width="match_parent"
+            android:layout_height="100dp" android:scaleType="centerCrop"
+            android:src="@drawable/brazil_flag" />
+        <TextView
+            android:id="@+id/selection_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_regular"
+            android:text="Brazil"
+            android:textAlignment="center"
+            ></TextView>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

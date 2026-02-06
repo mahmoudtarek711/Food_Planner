@@ -70,5 +70,9 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
     public interface OnMealClickListener {
         void onMealClick(MealDTO meal);
     }
+    public void setList(List<MealDTO> outerList)
+    {
+        meals = outerList;
+    }
 }
 
