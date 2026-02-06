@@ -51,7 +51,8 @@ public class AdapterSelection extends RecyclerView.Adapter<AdapterSelection.View
 
         if (item instanceof Area) {
             name = ((Area) item).getStrArea();
-            // Note: API doesn't provide flag images. You might need a local map or use a placeholder.
+            String countryCode = CountryMapper.getCode(name);
+            imageUrl = "https://flagcdn.com/w640/"+countryCode.toLowerCase()+".png";
             holder.imageView.setImageResource(R.drawable.applogo);
         } else if (item instanceof Category) {
             name = ((Category) item).getStrCategory();
