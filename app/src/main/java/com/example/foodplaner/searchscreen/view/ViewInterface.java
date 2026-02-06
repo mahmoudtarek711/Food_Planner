@@ -12,4 +12,5 @@ public interface ViewInterface {
     void showCategories(List<Category> categories);
     void showIngredients(List<Ingredient> ingredients);
     void showAreas(List<Area> areas);
+    void showFullMeal(MealDTO meal);
 }

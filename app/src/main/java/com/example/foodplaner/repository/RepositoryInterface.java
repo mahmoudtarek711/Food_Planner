@@ -24,5 +24,7 @@ public interface RepositoryInterface {
 
     Observable<List<MealDTO>> filterByArea(String areaName);
 
+    Observable<MealDTO> getFullMeal(String mealName);
+
 
 }
