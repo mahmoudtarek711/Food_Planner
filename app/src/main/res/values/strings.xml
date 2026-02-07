@@ -36,4 +36,5 @@
     <string name="name">Name</string>
     <string name="search_meals">Find Your Meals</string>
     <string name="search_bar_text">Search For Meals ....</string>
+    <string name="your_fav_meals">Your Favorite Meals</string>
 </resources>

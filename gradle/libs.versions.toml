@@ -10,6 +10,7 @@ constraintlayout = "2.2.1"
 fragment = "1.8.9"
 cardview = "1.0.0"
 recyclerview = "1.4.0"
+googleServices = "4.4.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,4 +26,5 @@ recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 

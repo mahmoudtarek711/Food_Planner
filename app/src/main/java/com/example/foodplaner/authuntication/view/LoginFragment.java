@@ -128,9 +128,29 @@ public class LoginFragment extends Fragment implements LoginViewInterface {
     }
 
     @Override
+    public void showLoading() {
+        // Show a ProgressBar or similar (e.g., login.setEnabled(false))
+    }
+
+    @Override
+    public void hideLoading() {
+        // Hide progress bar
+    }
+
+    @Override
     public void failLogin(String message) {
+        // Using a Toast or setting errors on the InputLayouts
         emailEditText.setError(message);
         passwordEditText.setError(message);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Prevent memory leaks and crashes after the view is gone
+        if (presenter instanceof LoginPresenter) {
+            ((LoginPresenter) presenter).dispose();
+        }
     }
 
 }

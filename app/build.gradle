@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -66,5 +67,19 @@ dependencies {
     implementation "io.reactivex.rxjava3:rxjava:3.1.8"
     implementation "io.reactivex.rxjava3:rxandroid:3.0.2"
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+    implementation 'com.google.firebase:firebase-auth:22.3.1'
+    implementation platform('com.google.firebase:firebase-bom:34.9.0')
+    implementation 'com.google.firebase:firebase-analytics'
 
+    def room_version = "2.6.1"
+
+    // Room core library
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    // RxJava 3 support for Room (This fixes the "cannot return Observable" error)
+    implementation "androidx.room:room-rxjava3:$room_version"
+
+    // Testing Room (optional)
+    testImplementation "androidx.room:room-testing:$room_version"
 }

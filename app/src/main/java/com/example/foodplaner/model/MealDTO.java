@@ -166,6 +166,7 @@ public class MealDTO implements Parcelable {
     }
 
     // ---------------- Getters ----------------
+    public String getStrIdMeal() { return idMeal; }
     public String getStrMeal() { return strMeal; }
     public String getStrMealThumb() { return strMealThumb; }
     public String getStrArea() { return strArea; }
@@ -181,5 +182,34 @@ public class MealDTO implements Parcelable {
     public List<String> getMeasures() {
         buildIngredientListsIfNeeded();
         return measures;
+    }
+    public MealRoomDTO toRoomDTO(String userEmail) {
+        MealRoomDTO room = new MealRoomDTO();
+        room.setIdMeal(this.idMeal);
+        room.setUserEmail(userEmail);
+        room.setStrMeal(this.strMeal);
+        room.setStrMealThumb(this.strMealThumb);
+        room.setStrArea(this.strArea);
+        room.setStrInstructions(this.strInstructions);
+        room.setStrYoutube(this.strYoutube);
+        room.setIngredients(this.getIngredients());
+        room.setMeasures(this.getMeasures());
+        return room;
+    }
+    public static MealDTO fromRoomDTO(MealRoomDTO roomDto) {
+        MealDTO dto = new MealDTO();
+        dto.idMeal = roomDto.getIdMeal();
+        dto.strMeal = roomDto.getStrMeal();
+        dto.strMealThumb = roomDto.getStrMealThumb();
+        dto.strArea = roomDto.getStrArea();
+        dto.strCategory = roomDto.getStrCategory();
+        dto.strInstructions = roomDto.getStrInstructions();
+        dto.strYoutube = roomDto.getStrYoutube();
+
+        // Convert the lists back
+        dto.ingredients = roomDto.getIngredients();
+        dto.measures = roomDto.getMeasures();
+
+        return dto;
     }
 }

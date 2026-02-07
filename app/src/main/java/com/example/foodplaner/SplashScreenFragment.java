@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.VideoView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -87,8 +90,19 @@ public class SplashScreenFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(@NonNull Animator animator) {
-                NavHostFragment.findNavController(SplashScreenFragment.this)
-                        .navigate(R.id.action_splashScreenFragment_to_loginFragment);
+                new Handler().postDelayed(() -> {
+                    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                    if (currentUser != null) {
+                        // User is logged in -> Go to Home
+                        NavHostFragment.findNavController(SplashScreenFragment.this)
+                                .navigate(R.id.action_splashScreenFragment_to_homeFragment);
+                    } else {
+                        // No user -> Go to Login/Signup
+                        NavHostFragment.findNavController(SplashScreenFragment.this)
+                                .navigate(R.id.action_splashScreenFragment_to_loginFragment);
+                    }
+                }, 0);
             }
 
             @Override

@@ -20,7 +20,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.foodplaner.R;
+import com.example.foodplaner.detailscreen.presenter.MealDetailsPresenter;
 import com.example.foodplaner.model.MealDTO;
+import com.example.foodplaner.repository.LocalRepositoryImp;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
@@ -31,15 +34,17 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
  * Use the {@link MealDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MealDetailsFragment extends Fragment {
+public class MealDetailsFragment extends Fragment implements MealDetailsViewInterface{
     TextView name;
     Button location;
     RecyclerView ing_rv;
     TextView steps;
     Button back_btn;
-    Button add_to_calendar;
+    MaterialButton add_to_calendar;
     MealDTO meal;
     ImageView meal_image;
+    private MealDetailsPresenter presenter;
+    private boolean isFavorite = false;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -91,6 +96,22 @@ public class MealDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // 1. Initialize Views
+        initViews(view);
+
+        // 2. Setup Presenter
+        presenter = new MealDetailsPresenter(this, LocalRepositoryImp.getInstance(requireContext()));
+
+        // 3. Get Data and Bind
+        meal = getArguments().getParcelable("meal");
+        if (meal != null) {
+            bindMealData(view, meal);
+            presenter.checkIfFavorite(meal.getStrIdMeal());
+        }
+
+        // 4. Navigation
+        back_btn.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
+        // 1. Initialize all views
         name = view.findViewById(R.id.meal_name_details_page);
         meal_image = view.findViewById(R.id.meal_img_details_page);
         location = view.findViewById(R.id.location_btn_details_page);
@@ -98,47 +119,44 @@ public class MealDetailsFragment extends Fragment {
         steps = view.findViewById(R.id.meal_steps_details_page);
         back_btn = view.findViewById(R.id.back_btn_details_page);
         add_to_calendar = view.findViewById(R.id.add_meal_to_calendar_btn);
-        add_to_calendar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, name.getText().toString() + " Added to favorites", Snackbar.LENGTH_SHORT).show();
-            }
-        });
-        back_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(MealDetailsFragment.this).navigateUp();
-            }
-        });
+        YouTubePlayerView youTubePlayerView = view.findViewById(R.id.youtube_player_view);
 
+        presenter = new MealDetailsPresenter(this, LocalRepositoryImp.getInstance(requireContext()));
         meal = getArguments().getParcelable("meal");
 
         if (meal != null) {
+            // UI Binding
             name.setText(meal.getStrMeal());
             location.setText(meal.getStrArea());
             steps.setText(meal.getStrInstructions());
-            Glide.with(getContext())
-                    .load(meal.getStrMealThumb()) // URL
-                    .placeholder(R.drawable.applogo) // optional
-                    .error(R.drawable.ic_launcher_background)       // optional
-                    .into(meal_image);
-
+            Glide.with(this).load(meal.getStrMealThumb()).placeholder(R.drawable.applogo).into(meal_image);
             setupIngredientsRecycler(meal);
-            YouTubePlayerView youTubePlayerView = view.findViewById(R.id.youtube_player_view);
-            getLifecycle().addObserver(youTubePlayerView);
 
+            // Database logic
+            presenter.checkIfFavorite(meal.getStrIdMeal());
+
+            // Favorite Button Logic
+            add_to_calendar.setOnClickListener(v -> {
+                if (isFavorite) {
+                    presenter.removeFromFavorite(meal);
+                    // Note: onFavoriteStatusChanged will handle the UI update via the presenter
+                } else {
+                    presenter.addToFavorite(meal);
+                }
+            });
+
+            // YouTube Logic
+            getLifecycle().addObserver(youTubePlayerView);
             youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
                 @Override
                 public void onReady(@NonNull YouTubePlayer youTubePlayer) {
                     String videoId = extractYoutubeId(meal.getStrYoutube());
-                    youTubePlayer.cueVideo(videoId, 0);
-
+                    if (videoId != null) youTubePlayer.cueVideo(videoId, 0);
                 }
             });
         }
 
-
-
+        back_btn.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
     }
     private void setupIngredientsRecycler(MealDTO meal) {
         ing_rv.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -167,6 +185,66 @@ public class MealDetailsFragment extends Fragment {
     }
 
 
+    @Override
+    public void onFavoriteStatusChanged(boolean isFav) {
+        this.isFavorite = isFav;
+        if (isFavorite) {
+            add_to_calendar.setIconResource(R.drawable.loop); // or your "X" icon
+            add_to_calendar.setIconTintResource(R.color.black); // visually show it's selected
+        } else {
+            add_to_calendar.setIconResource(R.drawable.favorite); // empty heart
+            add_to_calendar.setIconTintResource(R.color.white);
+        }
+    }
 
+    @Override
+    public void showMessage(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Explicitly release the YouTube player to stop all background streams
+        YouTubePlayerView youTubePlayerView = getView().findViewById(R.id.youtube_player_view);
+        if (youTubePlayerView != null) {
+            youTubePlayerView.release();
+        }
+    }
+    private void bindMealData(View view, MealDTO meal) {
+        name.setText(meal.getStrMeal());
+        location.setText(meal.getStrArea());
+        steps.setText(meal.getStrInstructions());
 
+        Glide.with(this).load(meal.getStrMealThumb()).into(meal_image);
+        setupIngredientsRecycler(meal);
+
+        // Favorite Toggle
+        add_to_calendar.setOnClickListener(v -> {
+            if (isFavorite) {
+                presenter.removeFromFavorite(meal);
+            } else {
+                presenter.addToFavorite(meal);
+            }
+        });
+
+        // YouTube
+        YouTubePlayerView youTubePlayerView = view.findViewById(R.id.youtube_player_view);
+        getLifecycle().addObserver(youTubePlayerView);
+        youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
+            @Override
+            public void onReady(@NonNull YouTubePlayer youTubePlayer) {
+                String videoId = extractYoutubeId(meal.getStrYoutube());
+                if(videoId != null) youTubePlayer.cueVideo(videoId, 0);
+            }
+        });
+    }
+    private void initViews(View view) {
+        name = view.findViewById(R.id.meal_name_details_page);
+        meal_image = view.findViewById(R.id.meal_img_details_page);
+        location = view.findViewById(R.id.location_btn_details_page);
+        ing_rv = view.findViewById(R.id.rv_ing_details_page);
+        steps = view.findViewById(R.id.meal_steps_details_page);
+        back_btn = view.findViewById(R.id.back_btn_details_page);
+        add_to_calendar = view.findViewById(R.id.add_meal_to_calendar_btn);
+    }
 }

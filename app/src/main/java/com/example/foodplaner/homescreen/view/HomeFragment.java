@@ -7,8 +7,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -30,8 +32,12 @@ import com.example.foodplaner.homescreen.presenter.HomeScreenPresenter;
 import com.example.foodplaner.homescreen.presenter.PresenterInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.R;
+import com.example.foodplaner.repository.LocalRepositoryImp;
+import com.example.foodplaner.repository.LocalRepositoryInterface;
 import com.example.foodplaner.repository.RepositoryImp;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import androidx.core.view.WindowInsetsCompat;
 
@@ -60,6 +66,9 @@ public class HomeFragment extends Fragment implements ViewInterface {
     TextView mealArea;
     private View contentLayout;
     private ProgressBar progressBar;
+    private RecyclerView favRecyclerView;
+    TextView yourFavoriteMealstxt;
+    private MealsAdapter favAdapter;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -116,7 +125,15 @@ public class HomeFragment extends Fragment implements ViewInterface {
         progressBar = view.findViewById(R.id.progressBar);
 
         repository = new RepositoryImp();
-        presenter = new HomeScreenPresenter(this,repository);
+        LocalRepositoryInterface localRepo = LocalRepositoryImp.getInstance(requireContext());
+        presenter = new HomeScreenPresenter(this,repository,localRepo);
+
+        yourFavoriteMealstxt = view.findViewById(R.id.your_favorite_meals_txt);
+        favRecyclerView = view.findViewById(R.id.favorite_recycler_view);
+        favRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
+
+        // Request Favorites
+        presenter.getFavoriteMeals();
 
         // 1. ALWAYS initialize your views first
         includeView = view.findViewById(R.id.mealOfTheDayLayout);
@@ -125,6 +142,18 @@ public class HomeFragment extends Fragment implements ViewInterface {
         mealArea = includeView.findViewById(R.id.big_meal_og);
         recyclerView = view.findViewById(R.id.meals_recycler_view);
         logout = view.findViewById(R.id.logout_btn);
+
+        TextView welcomeText = view.findViewById(R.id.client_name_home_text);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && user.getDisplayName() != null) {
+            welcomeText.setText(user.getDisplayName());
+        } else {
+            welcomeText.setText("Guest");
+        }
+        TextView date = view.findViewById(R.id.date_txt);
+        date.setText(getCurrentDate());
+
 
         // Set up LayoutManager
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -210,7 +239,10 @@ public class HomeFragment extends Fragment implements ViewInterface {
     @Override
     public void showLogoutSuccess() {
         NavHostFragment.findNavController(HomeFragment.this)
-                .navigate(R.id.action_homeFragment_to_loginFragment);
+                .navigate(R.id.action_homeFragment_to_loginFragment, null,
+                        new NavOptions.Builder()
+                                .setPopUpTo(R.id.nav_graph, true)
+                                .build());
     }
 
     @Override
@@ -240,6 +272,34 @@ public class HomeFragment extends Fragment implements ViewInterface {
     }
 
     @Override
+    public void displayFavoriteMeals(List<MealDTO> favorites) {
+        // Initialize the TextView variable if it hasn't been initialized yet
+        if (yourFavoriteMealstxt == null && getView() != null) {
+            yourFavoriteMealstxt = getView().findViewById(R.id.your_favorite_meals_txt);
+        }
+
+        if (favorites == null || favorites.isEmpty()) {
+            favRecyclerView.setVisibility(View.GONE);
+            if (yourFavoriteMealstxt != null) {
+                yourFavoriteMealstxt.setVisibility(View.GONE);
+            }
+        } else {
+            favRecyclerView.setVisibility(View.VISIBLE);
+            if (yourFavoriteMealstxt != null) {
+                yourFavoriteMealstxt.setVisibility(View.VISIBLE);
+            }
+
+            favAdapter = new MealsAdapter(favorites, meal -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("meal", meal);
+                NavHostFragment.findNavController(this)
+                        .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
+            });
+            favRecyclerView.setAdapter(favAdapter);
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
@@ -253,6 +313,19 @@ public class HomeFragment extends Fragment implements ViewInterface {
         if (randomMeal != null) {
             outState.putParcelable("RANDOM_MEAL", randomMeal);
         }
+    }
+    private String getCurrentDate() {
+        // "MMMM" is full month name (January)
+        // "d" is the day (6)
+        // "yyyy" is the year (2026)
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMMM d, yyyy", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date());
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        // This ensures the favorite list refreshes when you come back from Details
+        presenter.getFavoriteMeals();
     }
 
 
