@@ -1,5 +1,6 @@
 package com.example.foodplaner.detailscreen.view;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,10 +25,11 @@ import com.example.foodplaner.detailscreen.presenter.MealDetailsPresenter;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.repository.LocalRepositoryImp;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
+
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,12 +42,15 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
     RecyclerView ing_rv;
     TextView steps;
     Button back_btn;
+    MaterialButton add_to_favorites;
     MaterialButton add_to_calendar;
     MealDTO meal;
     ImageView meal_image;
     private MealDetailsPresenter presenter;
     private YouTubePlayerView youTubePlayerView;
     private boolean isFavorite = false;
+    private boolean isPlanned = false;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -127,7 +132,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
             presenter.checkIfFavorite(meal.getStrIdMeal());
 
             // Favorite Button Logic
-            add_to_calendar.setOnClickListener(v -> {
+            add_to_favorites.setOnClickListener(v -> {
                 if (isFavorite) {
                     presenter.removeFromFavorite(meal);
                     // Note: onFavoriteStatusChanged will handle the UI update via the presenter
@@ -148,6 +153,15 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
         }
 
         back_btn.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
+        presenter.checkIfPlanned(meal.getStrIdMeal());
+
+        add_to_calendar.setOnClickListener(v -> {
+
+            showDatePicker();
+
+        });
+
+
     }
     private void setupIngredientsRecycler(MealDTO meal) {
         ing_rv.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -180,11 +194,11 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
     public void onFavoriteStatusChanged(boolean isFav) {
         this.isFavorite = isFav;
         if (isFavorite) {
-            add_to_calendar.setIconResource(R.drawable.loop); // or your "X" icon
-            add_to_calendar.setIconTintResource(R.color.black); // visually show it's selected
+            add_to_favorites.setIconResource(R.drawable.heart_broken); // or your "X" icon
+            add_to_favorites.setIconTintResource(R.color.black); // visually show it's selected
         } else {
-            add_to_calendar.setIconResource(R.drawable.favorite); // empty heart
-            add_to_calendar.setIconTintResource(R.color.white);
+            add_to_favorites.setIconResource(R.drawable.favorite); // empty heart
+            add_to_favorites.setIconTintResource(R.color.white);
         }
     }
 
@@ -192,6 +206,35 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
     public void showMessage(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onCalendarStatusChanged(boolean planned) {
+
+    }
+
+    private void showDatePicker() {
+
+        Calendar calendar = Calendar.getInstance();
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                requireContext(),
+                (view, year, month, dayOfMonth) -> {
+
+                    String date = year + "-" + (month+1) + "-" + dayOfMonth;
+
+                    presenter.addToCalendar(meal, date);
+
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
+
+        dialog.show();
+    }
+
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -211,7 +254,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
         setupIngredientsRecycler(meal);
 
         // Favorite Toggle
-        add_to_calendar.setOnClickListener(v -> {
+        add_to_favorites.setOnClickListener(v -> {
             if (isFavorite) {
                 presenter.removeFromFavorite(meal);
             } else {
@@ -237,7 +280,8 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
         ing_rv = view.findViewById(R.id.rv_ing_details_page);
         steps = view.findViewById(R.id.meal_steps_details_page);
         back_btn = view.findViewById(R.id.back_btn_details_page);
-        add_to_calendar = view.findViewById(R.id.add_meal_to_calendar_btn);
+        add_to_favorites = view.findViewById(R.id.add_meal_to_calendar_btn);
         youTubePlayerView = view.findViewById(R.id.youtube_player_view);
+        add_to_calendar = view.findViewById(R.id.add_to_calendar_btn);
     }
 }

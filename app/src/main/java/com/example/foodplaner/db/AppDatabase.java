@@ -10,7 +10,7 @@ import androidx.room.TypeConverters;
 import com.example.foodplaner.model.MealRoomDTO;
 
 // 1. Define the entities and version
-@Database(entities = {MealRoomDTO.class}, version = 1, exportSchema = false)
+@Database(entities = {MealRoomDTO.class}, version = 2, exportSchema = false)
 // 2. Register the TypeConverter for your Ingredient/Measure lists
 @TypeConverters({DataConverter.class})
 public abstract class AppDatabase extends RoomDatabase {

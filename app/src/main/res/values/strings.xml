@@ -37,4 +37,5 @@
     <string name="search_meals">Find Your Meals</string>
     <string name="search_bar_text">Search For Meals ....</string>
     <string name="your_fav_meals">Your Favorite Meals</string>
+    <string name="add_to_calendar">Add To Calendar</string>
 </resources>

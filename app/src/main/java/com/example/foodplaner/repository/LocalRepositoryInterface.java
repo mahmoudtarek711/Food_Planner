@@ -22,4 +22,7 @@ public interface LocalRepositoryInterface {
 
     // Get Plan for specific date
     Observable<List<MealRoomDTO>> getStoredPlanByDate(String email, String date);
+    Single<Boolean> isMealFavorite(String mealId, String userEmail);
+    Single<Boolean> isMealPlanned(String mealId, String userEmail);
+
 }

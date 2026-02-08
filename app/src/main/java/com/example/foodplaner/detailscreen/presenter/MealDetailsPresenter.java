@@ -22,15 +22,36 @@ public class MealDetailsPresenter implements MealDetailsPresenterInterface {
 
     @Override
     public void addToFavorite(MealDTO meal) {
-        MealRoomDTO roomDTO = meal.toRoomDTO(userEmail); // Ensure you added this mapper in MealDTO
-        roomDTO.setFavorite(true);
 
-        repo.insertMeal(roomDTO)
+        repo.getSelectedMeal(meal.getStrIdMeal(), userEmail)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> view.onFavoriteStatusChanged(true),
-                        e -> view.showMessage("Error: " + e.getMessage()));
+                .subscribe(existingMeal -> {
+                    // Meal exists → update favorite
+                    existingMeal.setFavorite(true);
+                    repo.insertMeal(existingMeal)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    () -> view.onFavoriteStatusChanged(true),
+                                    e -> view.showMessage(e.getMessage())
+                            );
+
+                }, throwable -> {
+                    // Meal does NOT exist → create new row
+                    MealRoomDTO roomDTO = meal.toRoomDTO(userEmail);
+                    roomDTO.setFavorite(true);
+                    roomDTO.setDate(null); // no calendar date
+                    repo.insertMeal(roomDTO)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    () -> view.onFavoriteStatusChanged(true),
+                                    e -> view.showMessage(e.getMessage())
+                            );
+                });
     }
+
 
     @Override
     public void removeFromFavorite(MealDTO meal) {
@@ -38,44 +59,110 @@ public class MealDetailsPresenter implements MealDetailsPresenterInterface {
         repo.getSelectedMeal(meal.getStrIdMeal(), userEmail)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(existingMeal -> {
+                    existingMeal.setFavorite(false);
+
+                    if (existingMeal.getDate() == null) {
+                        // No date → safe to delete
+                        repo.deleteMeal(existingMeal)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        () -> view.onFavoriteStatusChanged(false),
+                                        e -> view.showMessage(e.getMessage())
+                                );
+                    } else {
+                        // Planned → just update favorite
+                        repo.insertMeal(existingMeal)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        () -> view.onFavoriteStatusChanged(false),
+                                        e -> view.showMessage(e.getMessage())
+                                );
+                    }
+
+                }, e -> view.showMessage(e.getMessage()));
+    }
+
+
+    @Override
+    public void checkIfFavorite(String mealId) {
+
+        repo.isMealFavorite(mealId, userEmail)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        isFav -> view.onFavoriteStatusChanged(isFav),
+                        e -> view.onFavoriteStatusChanged(false)
+                );
+    }
+
+
+    @Override
+    public void addToCalendar(MealDTO meal, String date) {
+        // Always create a new MealRoomDTO for calendar, even if it exists
+        MealRoomDTO newMeal = meal.toRoomDTO(userEmail);
+
+        newMeal.setDate(date);          // set the calendar date
+        newMeal.setFavorite(false);     // or keep favorite false for calendar duplicates
+
+        repo.insertMeal(newMeal)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> view.onCalendarStatusChanged(true),
+                        e -> view.showMessage(e.getMessage())
+                );
+    }
+
+
+
+    @Override
+    public void removeFromCalendar(MealDTO meal) {
+
+        repo.getSelectedMeal(meal.getStrIdMeal(), userEmail)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(roomDTO -> {
 
-                    roomDTO.setFavorite(false);
+                    roomDTO.setDate(null);
 
-                    if (roomDTO.getDate() == null) {
+                    if (!roomDTO.isFavorite()) {
 
-                        // FIX: add subscribeOn and observeOn
                         repo.deleteMeal(roomDTO)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(
-                                        () -> view.onFavoriteStatusChanged(false),
-                                        throwable -> view.showMessage("Error: " + throwable.getMessage())
+                                        () -> view.onCalendarStatusChanged(false),
+                                        e -> view.showMessage(e.getMessage())
                                 );
 
                     } else {
 
-                        // FIX: add subscribeOn and observeOn
                         repo.insertMeal(roomDTO)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(
-                                        () -> view.onFavoriteStatusChanged(false),
-                                        throwable -> view.showMessage("Error: " + throwable.getMessage())
+                                        () -> view.onCalendarStatusChanged(false),
+                                        e -> view.showMessage(e.getMessage())
                                 );
                     }
 
-                }, throwable -> view.showMessage("Error: " + throwable.getMessage()));
+                }, e -> view.showMessage(e.getMessage()));
     }
 
     @Override
-    public void checkIfFavorite(String mealId) {
-        repo.getSelectedMeal(mealId, userEmail)
+    public void checkIfPlanned(String mealId) {
+
+        repo.isMealPlanned(mealId, userEmail)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        item -> view.onFavoriteStatusChanged(item.isFavorite()),
-                        error -> view.onFavoriteStatusChanged(false)
+                        isPlanned -> view.onCalendarStatusChanged(isPlanned), // Boolean directly
+                        e -> view.onCalendarStatusChanged(false)
                 );
     }
+
+
 }

@@ -2,14 +2,17 @@ package com.example.foodplaner.model;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 import com.example.foodplaner.db.DataConverter; // We will create this below
 import java.util.List;
 
-@Entity(tableName = "meals_table", primaryKeys = {"idMeal", "userEmail"})
+@Entity(tableName = "meals_table")
 @TypeConverters(DataConverter.class)
 public class MealRoomDTO {
 
+    @PrimaryKey(autoGenerate = true)
+    public int id;
     @NonNull
     private String idMeal;
     @NonNull

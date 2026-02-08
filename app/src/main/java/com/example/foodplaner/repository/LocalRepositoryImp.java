@@ -50,4 +50,14 @@ public class LocalRepositoryImp implements LocalRepositoryInterface {
     public Observable<List<MealRoomDTO>> getStoredPlanByDate(String email, String date) {
         return dao.getPlanByDate(email, date);
     }
+    @Override
+    public Single<Boolean> isMealFavorite(String mealId, String userEmail) {
+        return dao.isMealFavorite(mealId, userEmail);
+    }
+
+    @Override
+    public Single<Boolean> isMealPlanned(String mealId, String userEmail) {
+        return dao.isMealFavorite(mealId, userEmail);
+    }
+
 }

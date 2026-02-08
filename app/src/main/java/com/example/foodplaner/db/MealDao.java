@@ -31,4 +31,10 @@ public interface MealDao {
 
     @Query("SELECT * FROM meals_table WHERE idMeal = :id AND userEmail = :email LIMIT 1")
     Single<MealRoomDTO> getMealById(String id, String email);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM meals_table WHERE idMeal = :mealId AND userEmail = :userEmail AND isFavorite = 1)")
+    Single<Boolean> isMealFavorite(String mealId, String userEmail);
+    @Query("SELECT EXISTS(SELECT 1 FROM meals_table WHERE idMeal = :mealId AND userEmail = :userEmail AND date IS NOT NULL)")
+    Single<Boolean> isMealPlanned(String mealId, String userEmail);
+
 }
