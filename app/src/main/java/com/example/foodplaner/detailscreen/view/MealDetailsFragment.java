@@ -44,6 +44,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
     MealDTO meal;
     ImageView meal_image;
     private MealDetailsPresenter presenter;
+    private YouTubePlayerView youTubePlayerView;
     private boolean isFavorite = false;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -111,17 +112,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
 
         // 4. Navigation
         back_btn.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
-        // 1. Initialize all views
-        name = view.findViewById(R.id.meal_name_details_page);
-        meal_image = view.findViewById(R.id.meal_img_details_page);
-        location = view.findViewById(R.id.location_btn_details_page);
-        ing_rv = view.findViewById(R.id.rv_ing_details_page);
-        steps = view.findViewById(R.id.meal_steps_details_page);
-        back_btn = view.findViewById(R.id.back_btn_details_page);
-        add_to_calendar = view.findViewById(R.id.add_meal_to_calendar_btn);
-        YouTubePlayerView youTubePlayerView = view.findViewById(R.id.youtube_player_view);
 
-        presenter = new MealDetailsPresenter(this, LocalRepositoryImp.getInstance(requireContext()));
         meal = getArguments().getParcelable("meal");
 
         if (meal != null) {
@@ -204,12 +195,13 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Explicitly release the YouTube player to stop all background streams
-        YouTubePlayerView youTubePlayerView = getView().findViewById(R.id.youtube_player_view);
+
         if (youTubePlayerView != null) {
             youTubePlayerView.release();
+            youTubePlayerView = null;
         }
     }
+
     private void bindMealData(View view, MealDTO meal) {
         name.setText(meal.getStrMeal());
         location.setText(meal.getStrArea());
@@ -246,5 +238,6 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
         steps = view.findViewById(R.id.meal_steps_details_page);
         back_btn = view.findViewById(R.id.back_btn_details_page);
         add_to_calendar = view.findViewById(R.id.add_meal_to_calendar_btn);
+        youTubePlayerView = view.findViewById(R.id.youtube_player_view);
     }
 }

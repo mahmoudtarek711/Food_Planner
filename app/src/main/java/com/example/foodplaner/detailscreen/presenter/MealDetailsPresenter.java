@@ -34,18 +34,38 @@ public class MealDetailsPresenter implements MealDetailsPresenterInterface {
 
     @Override
     public void removeFromFavorite(MealDTO meal) {
-        // First check if it has a date. If no date and unfavorited, we delete.
+
         repo.getSelectedMeal(meal.getStrIdMeal(), userEmail)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(roomDTO -> {
+
                     roomDTO.setFavorite(false);
+
                     if (roomDTO.getDate() == null) {
-                        repo.deleteMeal(roomDTO).subscribe(() -> view.onFavoriteStatusChanged(false));
+
+                        // FIX: add subscribeOn and observeOn
+                        repo.deleteMeal(roomDTO)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        () -> view.onFavoriteStatusChanged(false),
+                                        throwable -> view.showMessage("Error: " + throwable.getMessage())
+                                );
+
                     } else {
-                        repo.insertMeal(roomDTO).subscribe(() -> view.onFavoriteStatusChanged(false));
+
+                        // FIX: add subscribeOn and observeOn
+                        repo.insertMeal(roomDTO)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(
+                                        () -> view.onFavoriteStatusChanged(false),
+                                        throwable -> view.showMessage("Error: " + throwable.getMessage())
+                                );
                     }
-                }, throwable -> view.onFavoriteStatusChanged(false));
+
+                }, throwable -> view.showMessage("Error: " + throwable.getMessage()));
     }
 
     @Override
