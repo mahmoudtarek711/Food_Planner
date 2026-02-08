@@ -4,7 +4,10 @@ import com.example.foodplaner.homescreen.view.HomeFragment;
 import com.example.foodplaner.homescreen.view.ViewInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.model.MealResponse;
+import com.example.foodplaner.model.MealRoomDTO;
 import com.example.foodplaner.network.Network;
+import com.example.foodplaner.repository.AuthRepository;
+import com.example.foodplaner.repository.LocalRepositoryInterface;
 import com.example.foodplaner.repository.RepositoryImp;
 
 import java.util.ArrayList;
@@ -23,13 +26,17 @@ import retrofit2.Response;
 public class HomeScreenPresenter implements PresenterInterface {
     ViewInterface view;
     RepositoryImp repository;
+    AuthRepository AuthRepository;
+    LocalRepositoryInterface localRepo;
 
     private static List<MealDTO> cachedMeals = null;
     private static MealDTO cachedRandomMeal = null;
 
-    public HomeScreenPresenter(HomeFragment view,RepositoryImp repository) {
+    public HomeScreenPresenter(HomeFragment view,RepositoryImp repository,LocalRepositoryInterface localRepo) {
         this.view = view;
         this.repository = repository;
+        this.localRepo = localRepo;
+        this.AuthRepository = new AuthRepository();
     }
 
     @Override
@@ -82,6 +89,24 @@ public class HomeScreenPresenter implements PresenterInterface {
                 );
 
     }
+    public void getFavoriteMeals() {
+        String email = AuthRepository.getCurrentUserEmail(); // Or FirebaseAuth.getInstance().getCurrentUser().getEmail()
+
+        localRepo.getStoredFavorites(email)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        roomList -> {
+                            // Convert MealRoomDTO list back to MealDTO list for the adapter
+                            List<MealDTO> uiList = new ArrayList<>();
+                            for (MealRoomDTO room : roomList) {
+                                uiList.add(MealDTO.fromRoomDTO(room));
+                            }
+                            view.displayFavoriteMeals(uiList);
+                        },
+                        error -> view.showError(error.getMessage())
+                );
+    }
     @Override
     public void navigateToMealDetails (String mealID){
         view.showMealDetails(mealID);
@@ -89,8 +114,9 @@ public class HomeScreenPresenter implements PresenterInterface {
 
     @Override
     public void logoutUser () {
-        // Perform logout logic here (e.g., clear user session, tokens, etc.)
-        // For demonstration, we'll just call the view method directly.
+        AuthRepository.logout();
+        cachedMeals = null;
+        cachedRandomMeal = null;
         view.showLogoutSuccess();
     }
 

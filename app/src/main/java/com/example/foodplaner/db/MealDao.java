@@ -1,0 +1,40 @@
+package com.example.foodplaner.db;
+
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+
+import com.example.foodplaner.model.MealRoomDTO;
+
+import java.util.List;
+
+import io.reactivex.rxjava3.core.Completable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
+
+@Dao
+public interface MealDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    Completable insertOrUpdate(MealRoomDTO meal);
+
+    @Delete
+    Completable delete(MealRoomDTO meal);
+
+    @Query("SELECT * FROM meals_table WHERE userEmail = :email AND isFavorite = 1")
+    Observable<List<MealRoomDTO>> getFavorites(String email);
+
+    @Query("SELECT * FROM meals_table WHERE userEmail = :email AND date = :date")
+    Observable<List<MealRoomDTO>> getPlanByDate(String email, String date);
+
+    @Query("SELECT * FROM meals_table WHERE idMeal = :id AND userEmail = :email LIMIT 1")
+    Single<MealRoomDTO> getMealById(String id, String email);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM meals_table WHERE idMeal = :mealId AND userEmail = :userEmail AND isFavorite = 1)")
+    Single<Boolean> isMealFavorite(String mealId, String userEmail);
+    @Query("SELECT EXISTS(SELECT 1 FROM meals_table WHERE idMeal = :mealId AND userEmail = :userEmail AND date IS NOT NULL)")
+    Single<Boolean> isMealPlanned(String mealId, String userEmail);
+
+}

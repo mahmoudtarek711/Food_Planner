@@ -13,4 +13,5 @@ public interface ViewInterface {
     void showError(String error);
     void onProssessing();
     void onProcessingEnd();
+    void displayFavoriteMeals(List<MealDTO> favorites);
 }

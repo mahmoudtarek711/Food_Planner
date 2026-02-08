@@ -11,18 +11,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.foodplaner.R;
+import com.example.foodplaner.authuntication.presenter.SignupPresenter;
+import com.example.foodplaner.model.MealDTO;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SignupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SignupFragment extends Fragment {
+public class SignupFragment extends Fragment implements SignupViewInterface{
     TextView signinButton;
     Button signup;
+    EditText email;
+    EditText password;
+    EditText username;
+    private SignupPresenter presenter;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -74,20 +81,63 @@ public class SignupFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        presenter = new SignupPresenter(this);
         signinButton = view.findViewById(R.id.signin_txt_btn);
-        signinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(SignupFragment.this).navigateUp();
-            }
-        });
         signup = view.findViewById(R.id.btn_signup);
-        signup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavHostFragment.findNavController(SignupFragment.this)
-                        .navigate(R.id.action_signupFragment_to_homeFragment);
+        email = view.findViewById(R.id.email_input_signup);
+        password = view.findViewById(R.id.password_input_signup);
+        username = view.findViewById(R.id.fullname_input_signup);
+
+        signup.setOnClickListener(v -> {
+            String emailText = email.getText().toString().trim();
+            String passwordText = password.getText().toString().trim();
+            String usernameText = username.getText().toString().trim();
+
+            if (emailText.isEmpty() || passwordText.isEmpty()) {
+                ShowError("Email and Password cannot be empty");
+            } else {
+                presenter.RegisterAccountNormally(emailText, passwordText, usernameText);
             }
         });
+        signinButton.setOnClickListener(v->{
+            NavHostFragment.findNavController(SignupFragment.this)
+                    .navigate(R.id.action_signupFragment_to_loginFragment);
+        });
+
+
+    }
+
+    @Override
+    public void ShowError(String ErrorMessage) {
+
+    }
+
+    @Override
+    public void CorrectCredentials(MealDTO user) {
+
+    }
+
+    @Override
+    public void ShowLoading() {
+
+    }
+
+    @Override
+    public void HideLoading() {
+
+    }
+
+    @Override
+    public void NavigateToHome() {
+        NavHostFragment.findNavController(SignupFragment.this)
+                .navigate(R.id.action_signupFragment_to_homeFragment);
+    }
+    // Inside SignupFragment.java
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (presenter != null) {
+            presenter.clearDisposables();
+        }
     }
 }

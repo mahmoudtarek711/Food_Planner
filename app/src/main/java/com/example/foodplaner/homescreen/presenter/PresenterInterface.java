@@ -8,4 +8,5 @@ public interface PresenterInterface {
     void navigateToMealDetails(String mealID);
     void logoutUser();
     void navigateToMealDetails(MealDTO meal);
+    void getFavoriteMeals();
 }
