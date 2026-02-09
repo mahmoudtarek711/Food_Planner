@@ -1,18 +1,10 @@
 package com.example.foodplaner.homescreen.view;
 
-import android.graphics.drawable.Drawable;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavOptions;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +14,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.example.foodplaner.MainActivity;
+import com.example.foodplaner.R;
 import com.example.foodplaner.homescreen.presenter.HomeScreenPresenter;
 import com.example.foodplaner.homescreen.presenter.PresenterInterface;
 import com.example.foodplaner.model.MealDTO;
-import com.example.foodplaner.R;
 import com.example.foodplaner.repository.FirebaseSyncManager;
 import com.example.foodplaner.repository.LocalRepositoryImp;
 import com.example.foodplaner.repository.LocalRepositoryInterface;
@@ -40,103 +35,72 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import androidx.core.view.WindowInsetsCompat;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class HomeFragment extends Fragment implements ViewInterface {
-    PresenterInterface presenter;
+
+    private PresenterInterface presenter;
     private RecyclerView recyclerView;
     private MealsAdapter adapter;
     private List<MealDTO> mealList;
     private Button logout;
     private MealDTO randomMeal;
-    RepositoryImp repository;
+    private RepositoryImp repository;
 
-    View includeView ;
-
-    ImageView mealImg ;
-    TextView mealName ;
-    TextView mealArea;
+    private View includeView;
+    private ImageView mealImg;
+    private TextView mealName;
+    private TextView mealArea;
     private View contentLayout;
     private ProgressBar progressBar;
     private RecyclerView favRecyclerView;
-    TextView yourFavoriteMealstxt;
+    private TextView yourFavoriteMealstxt;
     private MealsAdapter favAdapter;
 
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private Snackbar connectivitySnackbar;
+    private boolean wasOffline = false;
 
     public HomeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        initViews(view);
+        setupPresenter();
+
+        // Setup persistent Snackbar
+        connectivitySnackbar = Snackbar.make(view, "No Internet Connection", Snackbar.LENGTH_INDEFINITE);
+
+        // Initial Logic flow
+        if (isNetworkAvailable()) {
+            wasOffline = false;
+            if (connectivitySnackbar.isShown()) connectivitySnackbar.dismiss();
+            handleDataLoading(savedInstanceState);
+        } else {
+            wasOffline = true;
+            connectivitySnackbar.show();
+            showOfflineUI();
+        }
+
+        setupNetworkListener();
+        setupUserData(view);
+    }
+
+    private void initViews(View view) {
         contentLayout = view.findViewById(R.id.home_scroll_view);
         progressBar = view.findViewById(R.id.progressBar);
-
-        repository = new RepositoryImp(getContext());
-        LocalRepositoryInterface localRepo = LocalRepositoryImp.getInstance(requireContext());
-        presenter = new HomeScreenPresenter(this,repository,localRepo);
-
         yourFavoriteMealstxt = view.findViewById(R.id.your_favorite_meals_txt);
         favRecyclerView = view.findViewById(R.id.favorite_recycler_view);
-        favRecyclerView.setLayoutManager(new GridLayoutManager(getContext(),2));
-
-        // Request Favorites
-        presenter.getFavoriteMeals();
-
-        // 1. ALWAYS initialize your views first
         includeView = view.findViewById(R.id.mealOfTheDayLayout);
         mealImg = includeView.findViewById(R.id.big_meal_img);
         mealName = includeView.findViewById(R.id.big_meal_name);
@@ -144,126 +108,174 @@ public class HomeFragment extends Fragment implements ViewInterface {
         recyclerView = view.findViewById(R.id.meals_recycler_view);
         logout = view.findViewById(R.id.logout_btn);
 
-        TextView welcomeText = view.findViewById(R.id.client_name_home_text);
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null && user.getDisplayName() != null) {
-            welcomeText.setText(user.getDisplayName());
-        } else {
-            welcomeText.setText("Guest");
-        }
-        TextView date = view.findViewById(R.id.date_txt);
-        date.setText(getCurrentDate());
-
-
-        // Set up LayoutManager
+        favRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        // 2. Set up listeners
         includeView.setOnClickListener(v -> presenter.navigateToMealDetails(randomMeal));
         logout.setOnClickListener(v -> presenter.logoutUser());
+    }
 
-        // 3. Now check if we already have data (Back Stack navigation)
+    private void setupPresenter() {
+        repository = new RepositoryImp(getContext());
+        LocalRepositoryInterface localRepo = LocalRepositoryImp.getInstance(requireContext());
+        presenter = new HomeScreenPresenter(this, repository, localRepo);
+    }
+
+    private void handleDataLoading(Bundle savedInstanceState) {
+        // 1. Restore from fragment memory (backstack navigation)
         if (mealList != null && randomMeal != null) {
             displayAllMeals(mealList);
-            bindRandomMeal(randomMeal);
-            progressBar.setVisibility(View.GONE);
-            contentLayout.setVisibility(View.VISIBLE);
-            return; // Data restored, stop here
-        }else
-        {
-            progressBar.setVisibility(View.VISIBLE);
-            contentLayout.setVisibility(View.GONE);
+            displayRandomMeal(randomMeal);
+            onProcessingEnd(); // CRITICAL: Explicitly hide loading when restoring from memory
+            presenter.getFavoriteMeals(); // Always refresh favorites
+            return;
         }
 
-        // 4. Handle State Restoration (System kill) vs First Launch
+        // 2. Restore from system bundle (process kill/rotation)
         if (savedInstanceState != null) {
             mealList = savedInstanceState.getParcelableArrayList("MEALS_LIST");
             randomMeal = savedInstanceState.getParcelable("RANDOM_MEAL");
-            if (mealList != null && randomMeal != null) {
-                progressBar.setVisibility(View.GONE);
-                contentLayout.setVisibility(View.VISIBLE);
+
+            boolean hasData = true;
+
+            if (mealList != null) {
+                displayAllMeals(mealList);
+            } else {
+                presenter.getAllMeals(false);
+                hasData = false;
             }
 
-            if (mealList != null) displayAllMeals(mealList);
-            else presenter.getAllMeals(false);
+            if (randomMeal != null) {
+                displayRandomMeal(randomMeal);
+            } else {
+                presenter.requestRandomMeal(false);
+                hasData = false;
+            }
 
-            if (randomMeal != null) bindRandomMeal(randomMeal);
-            else presenter.requestRandomMeal(false);
-
-        } else {
-            // Fresh launch
+            if (hasData) {
+                onProcessingEnd(); // CRITICAL: Hide loading if bundle had everything
+            }
+        }
+        // 3. Fresh Start
+        else {
             presenter.getAllMeals(false);
             presenter.requestRandomMeal(false);
         }
-        if (user != null && !user.isAnonymous()) {
-            syncFirebaseData();
-        } else {
-            // If guest, hide the favorite section immediately
-            favRecyclerView.setVisibility(View.GONE);
-            yourFavoriteMealstxt.setVisibility(View.GONE);
-        }
+
+        presenter.getFavoriteMeals();
+        syncFirebaseData();
     }
+
+    private void setupUserData(View view) {
+        TextView welcomeText = view.findViewById(R.id.client_name_home_text);
+        TextView dateTxt = view.findViewById(R.id.date_txt);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        welcomeText.setText((user != null && user.getDisplayName() != null) ? user.getDisplayName() : "Guest");
+        dateTxt.setText(getCurrentDate());
+    }
+
+    private void setupNetworkListener() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(@NonNull Network network) {
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    if (connectivitySnackbar.isShown()) connectivitySnackbar.dismiss();
+                    if (wasOffline) {
+                        // Only reload if we actually need data.
+                        // If we are showing data, don't refresh to avoid flickering.
+                        if (mealList == null || mealList.isEmpty()) {
+                            reloadOnlineData();
+                        } else {
+                            // We have data, just make sure UI is visible
+                            contentLayout.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                            includeView.setVisibility(View.VISIBLE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            Toast.makeText(getContext(), "Back Online!", Toast.LENGTH_SHORT).show();
+                            syncFirebaseData();
+                        }
+                        wasOffline = false;
+                    }
+                });
+            }
+
+            @Override
+            public void onLost(@NonNull Network network) {
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    wasOffline = true;
+                    connectivitySnackbar.show();
+                    showOfflineUI();
+                });
+            }
+        };
+        connectivityManager.registerDefaultNetworkCallback(networkCallback);
+    }
+
+    private void showOfflineUI() {
+        onProcessingEnd(); // Ensure progress bar is gone
+        includeView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        yourFavoriteMealstxt.setVisibility(View.VISIBLE);
+        favRecyclerView.setVisibility(View.VISIBLE);
+        presenter.getFavoriteMeals();
+    }
+
+    private void reloadOnlineData() {
+        includeView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+        presenter.getAllMeals(true);
+        presenter.requestRandomMeal(true);
+        syncFirebaseData();
+        Toast.makeText(getContext(), "Back Online!", Toast.LENGTH_SHORT).show();
+    }
+
+    // In HomeFragment.java
 
     @Override
     public void displayRandomMeal(MealDTO meal) {
         randomMeal = meal;
         mealName.setText(meal.getStrMeal());
         mealArea.setText(meal.getStrArea());
-        Glide.with(requireContext())
-                .load(meal.getStrMealThumb()) // URL
-                .placeholder(R.drawable.applogo) // optional
-                .error(R.drawable.ic_launcher_background)       // optional
-                .into(mealImg);
-    }
-    private void bindRandomMeal(MealDTO meal) {
-        mealName.setText(meal.getStrMeal());
-        mealArea.setText(meal.getStrArea());
 
         Glide.with(requireContext())
                 .load(meal.getStrMealThumb())
                 .placeholder(R.drawable.applogo)
+                .error(R.drawable.ic_launcher_background)
+                .diskCacheStrategy(com.bumptech.glide.load.engine.DiskCacheStrategy.ALL) // ADD THIS
                 .into(mealImg);
     }
-
 
     @Override
     public void displayAllMeals(List<MealDTO> meals) {
         mealList = meals;
-        adapter = new MealsAdapter(meals , meal -> {
+        adapter = new MealsAdapter(meals, meal -> {
             Bundle bundle = new Bundle();
             bundle.putParcelable("meal", meal);
-            NavHostFragment.findNavController(this)
-                    .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
+            NavHostFragment.findNavController(this).navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
         });
         recyclerView.setAdapter(adapter);
     }
 
     @Override
-    public void showMealDetails(String mealID) {
-
-    }
-
-    @Override
-    public void showLogoutSuccess() {
-        NavHostFragment.findNavController(HomeFragment.this)
-                .navigate(R.id.action_homeFragment_to_loginFragment, null,
-                        new NavOptions.Builder()
-                                .setPopUpTo(R.id.nav_graph, true)
-                                .build());
-    }
-
-    @Override
-    public void navigateToMealDetails(MealDTO meal) {
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("meal", randomMeal);
-        NavHostFragment.findNavController(this)
-                .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
-    }
-
-    @Override
-    public void showError(String error) {
-        Snackbar.make(requireView(), "Error In Fetching Data...", Snackbar.LENGTH_LONG).show();
+    public void displayFavoriteMeals(List<MealDTO> favorites) {
+        if (favorites == null || favorites.isEmpty()) {
+            favRecyclerView.setVisibility(View.GONE);
+            yourFavoriteMealstxt.setVisibility(View.GONE);
+        } else {
+            favRecyclerView.setVisibility(View.VISIBLE);
+            yourFavoriteMealstxt.setVisibility(View.VISIBLE);
+            favAdapter = new MealsAdapter(favorites, meal -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("meal", meal);
+                NavHostFragment.findNavController(this).navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
+            });
+            favRecyclerView.setAdapter(favAdapter);
+        }
     }
 
     @Override
@@ -274,97 +286,68 @@ public class HomeFragment extends Fragment implements ViewInterface {
 
     @Override
     public void onProcessingEnd() {
-
         progressBar.setVisibility(View.GONE);
         contentLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void displayFavoriteMeals(List<MealDTO> favorites) {
-        // Initialize the TextView variable if it hasn't been initialized yet
-        if (yourFavoriteMealstxt == null && getView() != null) {
-            yourFavoriteMealstxt = getView().findViewById(R.id.your_favorite_meals_txt);
-        }
+    public void showError(String error) {
+        Snackbar.make(requireView(), "Update failed. Check connection.", Snackbar.LENGTH_SHORT).show();
+    }
 
-        if (favorites == null || favorites.isEmpty()) {
-            favRecyclerView.setVisibility(View.GONE);
-            if (yourFavoriteMealstxt != null) {
-                yourFavoriteMealstxt.setVisibility(View.GONE);
-            }
-        } else {
-            favRecyclerView.setVisibility(View.VISIBLE);
-            if (yourFavoriteMealstxt != null) {
-                yourFavoriteMealstxt.setVisibility(View.VISIBLE);
-            }
+    @Override
+    public void showLogoutSuccess() {
+        NavHostFragment.findNavController(this).navigate(R.id.action_homeFragment_to_loginFragment, null,
+                new NavOptions.Builder().setPopUpTo(R.id.nav_graph, true).build());
+    }
 
-            favAdapter = new MealsAdapter(favorites, meal -> {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("meal", meal);
-                NavHostFragment.findNavController(this)
-                        .navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
-            });
-            favRecyclerView.setAdapter(favAdapter);
-        }
+    @Override
+    public void navigateToMealDetails(MealDTO meal) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("meal", meal);
+        NavHostFragment.findNavController(this).navigate(R.id.action_homeFragment_to_mealDetailsFragment, bundle);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        if (mealList != null) {
-            outState.putParcelableArrayList(
-                    "MEALS_LIST",
-                    new ArrayList<>(mealList)
-            );
-        }
-
-        if (randomMeal != null) {
-            outState.putParcelable("RANDOM_MEAL", randomMeal);
-        }
+        if (mealList != null) outState.putParcelableArrayList("MEALS_LIST", new ArrayList<>(mealList));
+        if (randomMeal != null) outState.putParcelable("RANDOM_MEAL", randomMeal);
     }
-    private String getCurrentDate() {
-        // "MMMM" is full month name (January)
-        // "d" is the day (6)
-        // "yyyy" is the year (2026)
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMMM d, yyyy", java.util.Locale.getDefault());
-        return sdf.format(new java.util.Date());
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
-    @Override
-    public void onResume() {
-        super.onResume();
+
+    private void syncFirebaseData() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        // Only refresh favorites if it's a real logged-in user
-        if (user != null && !user.isAnonymous()) {
-            presenter.getFavoriteMeals();
-        }
-    }
-    void syncFirebaseData() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        // 1. Only sync if user is logged in and is NOT a guest
         if (user != null && !user.isAnonymous()) {
             String email = user.getEmail();
             if (email != null) {
-                FirebaseSyncManager.getInstance(LocalRepositoryImp.getInstance(getContext()))
-                        .startSync(email);
-            }
-        }
-        // 2. If user is a Guest (Anonymous) or null
-        else {
-            // Ensure the TextView is linked before hiding
-            if (yourFavoriteMealstxt == null && getView() != null) {
-                yourFavoriteMealstxt = getView().findViewById(R.id.your_favorite_meals_txt);
-            }
-
-            // Hide the favorite section entirely
-            if (favRecyclerView != null) {
-                favRecyclerView.setVisibility(View.GONE);
-            }
-            if (yourFavoriteMealstxt != null) {
-                yourFavoriteMealstxt.setVisibility(View.GONE);
+                FirebaseSyncManager.getInstance(LocalRepositoryImp.getInstance(getContext())).startSync(email);
             }
         }
     }
 
+    private String getCurrentDate() {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMMM d, yyyy", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date());
+    }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (presenter != null) presenter.clearResources();
+        if (networkCallback != null) {
+            try {
+                ConnectivityManager cm = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                cm.unregisterNetworkCallback(networkCallback);
+            } catch (Exception e) {
+                Log.e("HomeFragment", "Callback unregister error", e);
+            }
+        }
+    }
+
+    @Override public void showMealDetails(String mealID) {}
 }

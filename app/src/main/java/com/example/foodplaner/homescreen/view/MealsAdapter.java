@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.R;
 
@@ -40,6 +41,7 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealViewHold
         holder.mealLocation.setText(meal.getStrArea());
         Glide.with(holder.itemView.getContext())
                 .load(meal.getStrMealThumb()) // URL
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.applogo) // optional
                 .error(R.drawable.ic_launcher_background)       // optional
                 .into(holder.mealImg);

@@ -9,4 +9,5 @@ public interface PresenterInterface {
     void logoutUser();
     void navigateToMealDetails(MealDTO meal);
     void getFavoriteMeals();
+    void clearResources();
 }
