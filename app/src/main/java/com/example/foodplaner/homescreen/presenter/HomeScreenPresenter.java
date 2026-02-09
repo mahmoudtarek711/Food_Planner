@@ -3,9 +3,7 @@ package com.example.foodplaner.homescreen.presenter;
 import com.example.foodplaner.homescreen.view.HomeFragment;
 import com.example.foodplaner.homescreen.view.ViewInterface;
 import com.example.foodplaner.model.MealDTO;
-import com.example.foodplaner.model.MealResponse;
 import com.example.foodplaner.model.MealRoomDTO;
-import com.example.foodplaner.network.Network;
 import com.example.foodplaner.repository.AuthRepository;
 import com.example.foodplaner.repository.LocalRepositoryInterface;
 import com.example.foodplaner.repository.RepositoryImp;
@@ -14,14 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.SingleObserver;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeScreenPresenter implements PresenterInterface {
     ViewInterface view;
@@ -31,8 +24,9 @@ public class HomeScreenPresenter implements PresenterInterface {
 
     private static List<MealDTO> cachedMeals = null;
     private static MealDTO cachedRandomMeal = null;
+    private final CompositeDisposable disposables = new CompositeDisposable();
 
-    public HomeScreenPresenter(HomeFragment view,RepositoryImp repository,LocalRepositoryInterface localRepo) {
+    public HomeScreenPresenter(HomeFragment view, RepositoryImp repository, LocalRepositoryInterface localRepo) {
         this.view = view;
         this.repository = repository;
         this.localRepo = localRepo;
@@ -41,79 +35,94 @@ public class HomeScreenPresenter implements PresenterInterface {
 
     @Override
     public void requestRandomMeal(boolean forceRefresh) {
+        // 1. If we have a cache and we DO NOT want to force refresh, show cache
         if (cachedRandomMeal != null && !forceRefresh){
             view.displayRandomMeal(cachedRandomMeal);
             view.onProcessingEnd();
             return;
         }
-        repository.getRandomMeal()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        meal -> {cachedRandomMeal=meal;view.displayRandomMeal(meal);},
 
-                        error -> view.showError(error.getMessage())
-                );
+        // 2. FIX: If forcing refresh, clear the cache immediately
+        if (forceRefresh) {
+            cachedRandomMeal = null;
+        }
+
+        disposables.add(
+                repository.getRandomMeal()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                meal -> {
+                                    cachedRandomMeal = meal;
+                                    view.displayRandomMeal(meal);
+                                },
+                                error -> view.showError(error.getMessage())
+                        )
+        );
     }
 
     @Override
     public void getAllMeals(boolean forceRefresh) {
+        // 1. Check Cache
         if (cachedMeals != null && !forceRefresh){
             view.displayAllMeals(cachedMeals);
             view.onProcessingEnd();
             return;
         }
-        Observable.range(1, 10)
-                .concatMap(i -> repository.getRandomMeal()) // call random meal 10 times
-                .toList() // collect all results into a List<MealDTO>
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleObserver<List<MealDTO>>() {
-                               @Override
-                               public void onSubscribe(@NonNull Disposable d) {
-                                   view.onProssessing();
-                               }
 
-                               @Override
-                               public void onSuccess(@NonNull List<MealDTO> mealDTOS) {
-                                   view.onProcessingEnd();
-                                   cachedMeals = mealDTOS;
-                                   view.displayAllMeals(mealDTOS);
-                               }
+        // 2. Show Loading UI
+        view.onProssessing();
 
-                               @Override
-                               public void onError(@NonNull Throwable e) {
-
-                               }
-                           }
-                );
-
+        // 3. Fetch 10 Random Meals
+        disposables.add(
+                Observable.range(1, 10)
+                        .concatMap(i -> repository.getRandomMeal()) // sequential calls
+                        .toList() // converts Observable to Single<List<MealDTO>>
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                mealDTOS -> {
+                                    // Success Handler
+                                    cachedMeals = mealDTOS;
+                                    view.displayAllMeals(mealDTOS);
+                                    view.onProcessingEnd(); // Ensure loading stops
+                                },
+                                throwable -> {
+                                    // Error Handler
+                                    view.onProcessingEnd(); // Ensure loading stops even on error
+                                    view.showError(throwable.getMessage());
+                                }
+                        )
+        );
     }
+
     public void getFavoriteMeals() {
-        String email = AuthRepository.getCurrentUserEmail(); // Or FirebaseAuth.getInstance().getCurrentUser().getEmail()
+        String email = AuthRepository.getCurrentUserEmail();
 
-        localRepo.getStoredFavorites(email)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        roomList -> {
-                            // Convert MealRoomDTO list back to MealDTO list for the adapter
-                            List<MealDTO> uiList = new ArrayList<>();
-                            for (MealRoomDTO room : roomList) {
-                                uiList.add(MealDTO.fromRoomDTO(room));
-                            }
-                            view.displayFavoriteMeals(uiList);
-                        },
-                        error -> view.showError(error.getMessage())
-                );
+        disposables.add(
+                localRepo.getStoredFavorites(email)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                roomList -> {
+                                    List<MealDTO> uiList = new ArrayList<>();
+                                    for (MealRoomDTO room : roomList) {
+                                        uiList.add(MealDTO.fromRoomDTO(room));
+                                    }
+                                    view.displayFavoriteMeals(uiList);
+                                },
+                                error -> view.showError(error.getMessage())
+                        )
+        );
     }
+
     @Override
-    public void navigateToMealDetails (String mealID){
+    public void navigateToMealDetails(String mealID){
         view.showMealDetails(mealID);
     }
 
     @Override
-    public void logoutUser () {
+    public void logoutUser() {
         AuthRepository.logout();
         cachedMeals = null;
         cachedRandomMeal = null;
@@ -125,4 +134,7 @@ public class HomeScreenPresenter implements PresenterInterface {
         view.navigateToMealDetails(meal);
     }
 
+    public void clearResources() {
+        disposables.clear();
+    }
 }
