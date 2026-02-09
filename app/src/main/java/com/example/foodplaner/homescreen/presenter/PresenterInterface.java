@@ -3,6 +3,7 @@ package com.example.foodplaner.homescreen.presenter;
 import com.example.foodplaner.model.MealDTO;
 
 public interface PresenterInterface {
+    void requestRandomMeal(android.content.SharedPreferences prefs);
     void requestRandomMeal(boolean forceRefresh);
     void getAllMeals(boolean forceRefresh);
     void navigateToMealDetails(String mealID);
