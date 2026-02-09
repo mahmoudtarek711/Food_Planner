@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.foodplaner.R;
 import com.example.foodplaner.authuntication.presenter.LoginPresenter;
 import com.example.foodplaner.authuntication.presenter.LoginPresenterInterface;
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * A simple {@link Fragment} subclass.

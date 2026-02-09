@@ -6,6 +6,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 
 public class AuthRepository {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -45,18 +46,15 @@ public class AuthRepository {
         });
     }
 
-    public Observable<FirebaseUser> loginGuest() {
-        return Observable.create(emitter -> {
-            mAuth.signInAnonymously().addOnCompleteListener(task -> {
-                if (!emitter.isDisposed()) {
-                    if (task.isSuccessful()) {
-                        emitter.onNext(mAuth.getCurrentUser());
-                        emitter.onComplete();
-                    } else {
-                        emitter.onError(task.getException());
-                    }
-                }
-            });
+    public Single<FirebaseUser> loginGuest() {
+        return Single.create(emitter -> {
+            FirebaseAuth.getInstance().signInAnonymously()
+                    .addOnSuccessListener(authResult -> {
+                        emitter.onSuccess(authResult.getUser());
+                    })
+                    .addOnFailureListener(e -> {
+                        emitter.onError(e);
+                    });
         });
     }
     public String getCurrentUserEmail()

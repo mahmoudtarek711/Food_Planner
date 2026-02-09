@@ -25,6 +25,8 @@ import com.example.foodplaner.detailscreen.presenter.MealDetailsPresenter;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.repository.LocalRepositoryImp;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
@@ -283,5 +285,16 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
         add_to_favorites = view.findViewById(R.id.add_meal_to_calendar_btn);
         youTubePlayerView = view.findViewById(R.id.youtube_player_view);
         add_to_calendar = view.findViewById(R.id.add_to_calendar_btn);
+        // Inside onViewCreated or a dedicated check method
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null || user.isAnonymous()) {
+            // Hide the buttons so the guest can't even click them
+            add_to_favorites.setVisibility(View.GONE);
+            add_to_calendar.setVisibility(View.GONE);
+        } else {
+            add_to_favorites.setVisibility(View.VISIBLE);
+            add_to_calendar.setVisibility(View.VISIBLE);
+        }
     }
 }

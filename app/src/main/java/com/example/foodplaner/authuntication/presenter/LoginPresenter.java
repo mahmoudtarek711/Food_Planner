@@ -4,6 +4,7 @@ import com.example.foodplaner.authuntication.view.LoginFragment;
 import com.example.foodplaner.authuntication.view.LoginViewInterface;
 import com.example.foodplaner.network.Network;
 import com.example.foodplaner.repository.AuthRepository;
+import com.google.firebase.auth.FirebaseAuth;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
@@ -46,7 +47,7 @@ public class LoginPresenter implements LoginPresenterInterface{
     public void loginAsGuest() {
         view.showLoading();
         disposable.add(
-                repo.loginGuest()
+                repo.loginGuest() // This should be a clean call to Firebase
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(

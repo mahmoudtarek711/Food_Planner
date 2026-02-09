@@ -196,7 +196,13 @@ public class HomeFragment extends Fragment implements ViewInterface {
             presenter.getAllMeals(false);
             presenter.requestRandomMeal(false);
         }
-        syncFirebaseData();
+        if (user != null && !user.isAnonymous()) {
+            syncFirebaseData();
+        } else {
+            // If guest, hide the favorite section immediately
+            favRecyclerView.setVisibility(View.GONE);
+            yourFavoriteMealstxt.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -326,17 +332,39 @@ public class HomeFragment extends Fragment implements ViewInterface {
     @Override
     public void onResume() {
         super.onResume();
-        // This ensures the favorite list refreshes when you come back from Details
-        presenter.getFavoriteMeals();
-    }
-    void syncFirebaseData() {
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        if(email != null){
-            FirebaseSyncManager.getInstance(LocalRepositoryImp.getInstance(getContext()))
-                    .startSync(email);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        // Only refresh favorites if it's a real logged-in user
+        if (user != null && !user.isAnonymous()) {
+            presenter.getFavoriteMeals();
         }
     }
+    void syncFirebaseData() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+        // 1. Only sync if user is logged in and is NOT a guest
+        if (user != null && !user.isAnonymous()) {
+            String email = user.getEmail();
+            if (email != null) {
+                FirebaseSyncManager.getInstance(LocalRepositoryImp.getInstance(getContext()))
+                        .startSync(email);
+            }
+        }
+        // 2. If user is a Guest (Anonymous) or null
+        else {
+            // Ensure the TextView is linked before hiding
+            if (yourFavoriteMealstxt == null && getView() != null) {
+                yourFavoriteMealstxt = getView().findViewById(R.id.your_favorite_meals_txt);
+            }
+
+            // Hide the favorite section entirely
+            if (favRecyclerView != null) {
+                favRecyclerView.setVisibility(View.GONE);
+            }
+            if (yourFavoriteMealstxt != null) {
+                yourFavoriteMealstxt.setVisibility(View.GONE);
+            }
+        }
+    }
 
 
 }

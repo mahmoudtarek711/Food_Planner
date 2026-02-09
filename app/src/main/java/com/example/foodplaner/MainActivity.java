@@ -59,5 +59,14 @@ public class MainActivity extends AppCompatActivity {
         //sync with firebase store
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
+        // Inside MainActivity onCreate
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || user.isAnonymous()) {
+            bottomNav.getMenu().findItem(R.id.calendarFragment).setVisible(false);
+        }else
+        {
+            bottomNav.getMenu().findItem(R.id.calendarFragment).setVisible(true);
+        }
+
     }
 }
