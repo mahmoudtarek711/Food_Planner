@@ -46,8 +46,26 @@ public class SignupPresenter implements SignupPresernterInterface{
     }
 
     @Override
-    public void RegisterAccountGoogle(String username, String password) {
+    public void RegisterAccountGoogle(String idToken) {
+        view.ShowLoading();
 
+        // Assuming your Repo has a method 'loginWithGoogle(idToken)'
+        // If not, you must add it to AuthRepository (see Step 4 below)
+        disposable.add(
+                repo.loginWithGoogle(idToken)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                () -> {
+                                    view.HideLoading();
+                                    view.NavigateToHome();
+                                },
+                                throwable -> {
+                                    view.HideLoading();
+                                    view.ShowError(throwable.getMessage());
+                                }
+                        )
+        );
     }
 
     @Override
