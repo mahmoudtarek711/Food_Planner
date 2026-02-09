@@ -1,6 +1,6 @@
 package com.example.foodplaner.calendarscreen.presenter;
 
-import android.util.Log; // Import Log
+import android.util.Log;
 
 import com.example.foodplaner.calendarscreen.view.CalendarViewInterface;
 import com.example.foodplaner.model.MealRoomDTO;
@@ -19,7 +19,6 @@ public class CalendarPresenter implements CalendarPresenterInterface {
     private CompositeDisposable disposable = new CompositeDisposable();
     private String userEmail;
 
-    // 1. Pass the email in the constructor
     public CalendarPresenter(CalendarViewInterface view, LocalRepositoryInterface repository) {
         this.view = view;
         this.repository = repository;
@@ -30,7 +29,6 @@ public class CalendarPresenter implements CalendarPresenterInterface {
 
     @Override
     public void getMealsByDate(String date) {
-        // 2. Add this Log to see exactly what is being requested
         Log.i("CalendarDebug", "Requesting Plan -> Email: " + userEmail + " | Date: " + date);
 
         disposable.add(
@@ -39,11 +37,11 @@ public class CalendarPresenter implements CalendarPresenterInterface {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
                                 (List<MealRoomDTO> meals) -> {
-                                    Log.i("CalendarDebug", "Meals Found: " + meals.size());
+                                    Log.i("CalendarDebug", "Meals Found for " + date + ": " + meals.size());
                                     view.showMeals(meals);
                                 },
                                 (Throwable error) -> {
-                                    Log.e("CalendarDebug", "Error: " + error.getMessage());
+                                    Log.e("CalendarDebug", "Error fetching meals: " + error.getMessage());
                                     view.showError(error.getMessage());
                                 }
                         )
@@ -52,27 +50,23 @@ public class CalendarPresenter implements CalendarPresenterInterface {
 
     @Override
     public void removeMeal(MealRoomDTO meal) {
-        if (meal.isFavorite()) {
-            // Just clear the date fields, DO NOT delete
-            meal.setDate(null);
-            // Optional: if you have a specific isPlanned boolean, set it to false here
+        // With the Composite Primary Key {idMeal, userEmail, date},
+        // this 'meal' object contains the specific date it was planned for.
+        // Deleting it will remove only this specific day's entry from Room and Firebase.
 
-            disposable.add(repository.insertMeal(meal)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            () -> view.onRemoveMealSuccess(meal),
-                            e -> view.showError(e.getMessage())
-                    ));
-        } else {
-            disposable.add(repository.deleteMeal(meal)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            () -> view.onRemoveMealSuccess(meal),
-                            e -> view.showError(e.getMessage())
-                    ));
-        }
+        disposable.add(repository.deleteMeal(meal)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> {
+                            Log.i("CalendarDebug", "Meal deleted from Calendar: " + meal.getStrMeal());
+                            view.onRemoveMealSuccess(meal);
+                        },
+                        e -> {
+                            Log.e("CalendarDebug", "Delete failed: " + e.getMessage());
+                            view.showError(e.getMessage());
+                        }
+                ));
     }
 
     public void clearDisposables() {

@@ -32,6 +32,7 @@ import com.example.foodplaner.homescreen.presenter.HomeScreenPresenter;
 import com.example.foodplaner.homescreen.presenter.PresenterInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.R;
+import com.example.foodplaner.repository.FirebaseSyncManager;
 import com.example.foodplaner.repository.LocalRepositoryImp;
 import com.example.foodplaner.repository.LocalRepositoryInterface;
 import com.example.foodplaner.repository.RepositoryImp;
@@ -124,7 +125,7 @@ public class HomeFragment extends Fragment implements ViewInterface {
         contentLayout = view.findViewById(R.id.home_scroll_view);
         progressBar = view.findViewById(R.id.progressBar);
 
-        repository = new RepositoryImp();
+        repository = new RepositoryImp(getContext());
         LocalRepositoryInterface localRepo = LocalRepositoryImp.getInstance(requireContext());
         presenter = new HomeScreenPresenter(this,repository,localRepo);
 
@@ -195,6 +196,7 @@ public class HomeFragment extends Fragment implements ViewInterface {
             presenter.getAllMeals(false);
             presenter.requestRandomMeal(false);
         }
+        syncFirebaseData();
     }
 
     @Override
@@ -327,6 +329,14 @@ public class HomeFragment extends Fragment implements ViewInterface {
         // This ensures the favorite list refreshes when you come back from Details
         presenter.getFavoriteMeals();
     }
+    void syncFirebaseData() {
+        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        if(email != null){
+            FirebaseSyncManager.getInstance(LocalRepositoryImp.getInstance(getContext()))
+                    .startSync(email);
+        }
+    }
+
 
 
 }

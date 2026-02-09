@@ -1,5 +1,7 @@
 package com.example.foodplaner.repository;
 
+import android.content.Context;
+
 import com.example.foodplaner.model.Area;
 import com.example.foodplaner.model.Category;
 import com.example.foodplaner.model.Ingredient;
@@ -12,10 +14,14 @@ import java.util.List;
 import io.reactivex.rxjava3.core.Observable;
 
 public class RepositoryImp implements RepositoryInterface{
+    FirebaseRepository firebaseRepo;
+    LocalRepositoryInterface localRepo;
     MealApiServices api;
 
-    public RepositoryImp() {
+    public RepositoryImp(Context context) {
         api = Network.getInstance();
+        firebaseRepo = new FirebaseRepository();
+        localRepo = LocalRepositoryImp.getInstance(context);
     }
     @Override
     public Observable<List<MealDTO>> getSomeMeals() {
