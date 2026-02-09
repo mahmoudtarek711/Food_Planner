@@ -5,6 +5,7 @@ import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.model.MealRoomDTO;
 import com.example.foodplaner.repository.LocalRepositoryInterface;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -17,13 +18,22 @@ public class MealDetailsPresenter implements MealDetailsPresenterInterface {
     public MealDetailsPresenter(MealDetailsViewInterface view, LocalRepositoryInterface repo) {
         this.view = view;
         this.repo = repo;
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            this.userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        // Handle Guest Case
+        if (currentUser != null && !currentUser.isAnonymous()) {
+            this.userEmail = currentUser.getEmail();
+        } else {
+            this.userEmail = null; // Guest user has no email
         }
     }
 
     @Override
     public void addToFavorite(MealDTO meal) {
+        if (userEmail == null) {
+            view.showMessage("Guest cannot add to favorites. Please Login.");
+            return;
+        }
         MealRoomDTO roomDTO = meal.toRoomDTO(userEmail);
         roomDTO.setFavorite(true);
         roomDTO.setDate("favorite"); // Explicitly set "favorite" as the date
@@ -67,6 +77,10 @@ public class MealDetailsPresenter implements MealDetailsPresenterInterface {
 
     @Override
     public void addToCalendar(MealDTO meal, String date) {
+        if (userEmail == null) {
+            view.showMessage("Guest cannot add to favorites. Please Login.");
+            return;
+        }
         MealRoomDTO roomDTO = meal.toRoomDTO(userEmail);
         roomDTO.setDate(date); // The specific date (e.g., "2026-02-10")
         roomDTO.setFavorite(false);
