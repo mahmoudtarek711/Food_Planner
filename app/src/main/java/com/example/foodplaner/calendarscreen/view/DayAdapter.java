@@ -18,7 +18,10 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
     private OnDayClickListener listener;
     private int selectedPos = -1;
 
-    public interface OnDayClickListener { void onDayClick(int position, DayModel day); }
+    // Define the interface once
+    public interface OnDayClickListener {
+        void onDayClick(int position, DayModel day);
+    }
 
     public DayAdapter(List<DayModel> list, OnDayClickListener listener) {
         this.list = list;
@@ -38,13 +41,28 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.ViewHolder> {
         holder.tvNum.setText(day.getDayNumber());
         holder.tvName.setText(day.getDayName());
 
-        holder.itemView.setBackgroundColor(selectedPos == position ? Color.LTGRAY : Color.TRANSPARENT);
+        // Highlight the selected day
+        if (selectedPos == position) {
+            holder.itemView.setBackgroundResource(R.drawable.day_selector_colors_on_click);
+            holder.tvNum.setTextColor(Color.WHITE);
+            holder.tvName.setTextColor(Color.WHITE);
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+            // Using Color.BLACK or your theme colors
+            holder.tvNum.setTextColor(Color.BLACK);
+            holder.tvName.setTextColor(Color.DKGRAY);
+        }
+
         holder.itemView.setOnClickListener(v -> {
             int old = selectedPos;
             selectedPos = holder.getAdapterPosition();
             notifyItemChanged(old);
             notifyItemChanged(selectedPos);
-            listener.onDayClick(selectedPos, day);
+
+            // Pass BOTH the position and the day object
+            if (listener != null) {
+                listener.onDayClick(selectedPos, day);
+            }
         });
     }
 

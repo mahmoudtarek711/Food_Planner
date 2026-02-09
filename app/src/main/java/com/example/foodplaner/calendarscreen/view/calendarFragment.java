@@ -1,18 +1,24 @@
 package com.example.foodplaner.calendarscreen.view;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodplaner.R;
+import com.example.foodplaner.calendarscreen.presenter.CalendarPresenter;
 import com.example.foodplaner.model.DayModel;
+import com.example.foodplaner.model.MealRoomDTO;
+import com.example.foodplaner.repository.LocalRepositoryImp;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,117 +26,137 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link calendarFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class calendarFragment extends Fragment {
-    private TextView tvYear, tvMonth, tvMealName;
+public class calendarFragment extends Fragment implements CalendarViewInterface {
+
+    private TextView tvYear, tvMonth;
     private RecyclerView rvDays;
-    private View mealCard;
+    private RecyclerView rvPlannedMeals;
+
+    private CalendarPresenter presenter;
     private Calendar currentCal;
-    private LinearLayoutManager layoutManager;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private PlannedMealsAdapter plannedMealsAdapter;
+    private String selectedDate;
 
     public calendarFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment calendarFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static calendarFragment newInstance(String param1, String param2) {
-        calendarFragment fragment = new calendarFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_calendar, container, false);
+        return inflater.inflate(R.layout.fragment_calendar, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initViews(view);
+
+        presenter = new CalendarPresenter(this, LocalRepositoryImp.getInstance(getContext()));
+        currentCal = Calendar.getInstance();
+
+        setupListeners(view);
+        syncUI(); // Generate the calendar days
+    }
+
+    private void initViews(View view) {
         tvYear = view.findViewById(R.id.tvYear);
         tvMonth = view.findViewById(R.id.tvMonth);
+
+        // 1. Setup Days Horizontal RecyclerView
         rvDays = view.findViewById(R.id.rvDays);
-        mealCard = view.findViewById(R.id.mealCard);
-        tvMealName = view.findViewById(R.id.tvMealName);
+        rvDays.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
-        currentCal = Calendar.getInstance();
-        layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        rvDays.setLayoutManager(layoutManager);
+        // 2. Setup Planned Meals Vertical RecyclerView
+        rvPlannedMeals = view.findViewById(R.id.rvPlannedMeals);
+        rvPlannedMeals.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Year Buttons
+        // Initialize Adapter with the Remove Click listener
+        plannedMealsAdapter = new PlannedMealsAdapter(new ArrayList<>(), meal -> {
+            presenter.removeMeal(meal);
+        });
+        rvPlannedMeals.setAdapter(plannedMealsAdapter);
+    }
+
+    private void setupListeners(View view) {
+        // Year Navigation
         view.findViewById(R.id.btnPrevYear).setOnClickListener(v -> { currentCal.add(Calendar.YEAR, -1); syncUI(); });
         view.findViewById(R.id.btnNextYear).setOnClickListener(v -> { currentCal.add(Calendar.YEAR, 1); syncUI(); });
 
-        // Month Buttons
+        // Month Navigation
         view.findViewById(R.id.btnPrevMonth).setOnClickListener(v -> { currentCal.add(Calendar.MONTH, -1); syncUI(); });
         view.findViewById(R.id.btnNextMonth).setOnClickListener(v -> { currentCal.add(Calendar.MONTH, 1); syncUI(); });
-
-        // Day Scroll Buttons
-        view.findViewById(R.id.btnPrevDayScroll).setOnClickListener(v -> {
-            int first = layoutManager.findFirstVisibleItemPosition();
-            if (first > 0) rvDays.smoothScrollToPosition(first - 1);
-        });
-        view.findViewById(R.id.btnNextDayScroll).setOnClickListener(v -> {
-            int last = layoutManager.findLastVisibleItemPosition();
-            if (last < rvDays.getAdapter().getItemCount() - 1) rvDays.smoothScrollToPosition(last + 1);
-        });
-
-        view.findViewById(R.id.btnRemoveMeal).setOnClickListener(v -> mealCard.setVisibility(View.GONE));
-
-        syncUI();
-        return view;
     }
+
     private void syncUI() {
-        // Update Text
+        // 1. Update Year and Month Header
         tvYear.setText(String.valueOf(currentCal.get(Calendar.YEAR)));
         tvMonth.setText(new SimpleDateFormat("MMMM", Locale.getDefault()).format(currentCal.getTime()));
 
-        // Update Days
+        // 2. Generate Days for the current month
         List<DayModel> days = new ArrayList<>();
         Calendar temp = (Calendar) currentCal.clone();
         temp.set(Calendar.DAY_OF_MONTH, 1);
-        int max = temp.getActualMaximum(Calendar.DAY_OF_MONTH);
-        SimpleDateFormat fmt = new SimpleDateFormat("EEE", Locale.getDefault());
+        int maxDays = temp.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        for (int i = 1; i <= max; i++) {
-            days.add(new DayModel(fmt.format(temp.getTime()), String.valueOf(i)));
+        SimpleDateFormat displayFmt = new SimpleDateFormat("EEE", Locale.getDefault());
+        SimpleDateFormat dbFmt = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
+
+        for (int i = 1; i <= maxDays; i++) {
+            days.add(new DayModel(
+                    displayFmt.format(temp.getTime()),
+                    String.valueOf(i),
+                    dbFmt.format(temp.getTime())
+            ));
             temp.add(Calendar.DAY_OF_MONTH, 1);
         }
 
+        // 3. Set the Days Adapter
         DayAdapter adapter = new DayAdapter(days, (pos, day) -> {
-            tvMealName.setText("Meal for " + day.getDayNumber() + " " + tvMonth.getText());
-            mealCard.setVisibility(View.VISIBLE);
+            selectedDate = day.getFullDate();
+            Log.i("CalendarDebug", "Selected Date: " + selectedDate);
+            presenter.getMealsByDate(selectedDate);
         });
         rvDays.setAdapter(adapter);
+    }
+
+    @Override
+    public void showMeals(List<MealRoomDTO> meals) {
+        if (meals != null && !meals.isEmpty()) {
+            rvPlannedMeals.setVisibility(View.VISIBLE);
+            plannedMealsAdapter.setList(meals);
+        } else {
+            rvPlannedMeals.setVisibility(View.GONE);
+            plannedMealsAdapter.setList(new ArrayList<>()); // Clear existing
+            Log.i("CalendarDebug", "No meals for this date.");
+        }
+    }
+
+    @Override
+    public void showRemoveSuccess() {
+
+    }
+
+    @Override
+    public void onRemoveMealSuccess(MealRoomDTO meal) {
+        Toast.makeText(getContext(), "Meal removed", Toast.LENGTH_SHORT).show();
+        // Refresh the list from the database to reflect changes
+        if (selectedDate != null) {
+            presenter.getMealsByDate(selectedDate);
+        }
+    }
+
+    @Override
+    public void showError(String msg) {
+        Toast.makeText(getContext(), "Error: " + msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (presenter != null) {
+            presenter.clearDisposables();
+        }
     }
 }

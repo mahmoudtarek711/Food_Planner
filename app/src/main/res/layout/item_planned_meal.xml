@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="16dp"
+    android:padding="4dp">
+
+    <include
+        android:id="@+id/included_meal_card"
+        layout="@layout/meal_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btnRemoveMeal"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="8dp"
+        android:text="Remove from Plan"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="14sp"
+        app:icon="@drawable/block"
+        app:iconTint="@android:color/holo_red_light" />
+
+</LinearLayout>
