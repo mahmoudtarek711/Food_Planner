@@ -204,7 +204,7 @@ public class SearchFragment extends Fragment implements ViewInterface {
     public void showMeals(List<MealDTO> meals) {
         mealAdapter.setList(meals);
         mealAdapter.notifyDataSetChanged();
-        
+
     }
 
     @Override
