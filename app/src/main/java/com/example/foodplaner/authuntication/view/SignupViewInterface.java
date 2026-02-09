@@ -8,4 +8,5 @@ public interface SignupViewInterface {
     void ShowLoading();
     void HideLoading();
     void NavigateToHome();
+    void RegisterAccountGoogle(String idToken);
 }

@@ -1,7 +1,9 @@
 package com.example.foodplaner.repository;
 
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
 import io.reactivex.rxjava3.core.Completable;
@@ -63,5 +65,18 @@ public class AuthRepository {
     }
     public void logout() {
         FirebaseAuth.getInstance().signOut();
+    }
+    public Completable loginWithGoogle(String idToken) {
+        return Completable.create(emitter -> {
+            AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+            FirebaseAuth.getInstance().signInWithCredential(credential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            emitter.onComplete();
+                        } else {
+                            emitter.onError(task.getException());
+                        }
+                    });
+        });
     }
 }

@@ -2,11 +2,18 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
 }
+Properties properties = new Properties()
+if (project.rootProject.file('local.properties').exists()) {
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+}
 
 android {
     namespace 'com.example.foodplaner'
     compileSdk {
         version = release(36)
+    }
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -17,6 +24,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "WEB_CLIENT_ID", "\"${properties.getProperty('WEB_CLIENT_ID')}\""
     }
 
     buildTypes {
@@ -85,4 +93,7 @@ dependencies {
 
     //firebase database
     implementation("com.google.firebase:firebase-database:21.0.0")
+
+
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
 }
