@@ -231,7 +231,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
-
+        dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         dialog.show();
     }
 
