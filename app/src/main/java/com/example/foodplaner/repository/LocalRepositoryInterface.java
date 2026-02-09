@@ -24,5 +24,11 @@ public interface LocalRepositoryInterface {
     Observable<List<MealRoomDTO>> getStoredPlanByDate(String email, String date);
     Single<Boolean> isMealFavorite(String mealId, String userEmail);
     Single<Boolean> isMealPlanned(String mealId, String userEmail);
+    Completable insertMealLocalOnly(MealRoomDTO meal);
+    Single<Boolean> exists(String mealId, String userEmail, String date);
+    Completable deleteMealLocalOnly(MealRoomDTO meal);
+
+
+
 
 }

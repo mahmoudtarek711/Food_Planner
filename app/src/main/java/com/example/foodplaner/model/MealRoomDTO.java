@@ -4,19 +4,26 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
-import com.example.foodplaner.db.DataConverter; // We will create this below
+import com.example.foodplaner.db.DataConverter;
 import java.util.List;
 
-@Entity(tableName = "meals_table")
+/**
+ * Composite Primary Key: {idMeal, userEmail, date}
+ * This ensures that a user cannot have duplicate rows for the same meal on the same day.
+ * For favorites that aren't on the calendar, 'date' defaults to "favorite".
+ */
+@Entity(tableName = "meals_table", primaryKeys = {"idMeal", "userEmail", "date"})
 @TypeConverters(DataConverter.class)
 public class MealRoomDTO {
 
-    @PrimaryKey(autoGenerate = true)
-    public int id;
     @NonNull
     private String idMeal;
+
     @NonNull
     private String userEmail;
+
+    @NonNull
+    private String date = "favorite"; // Default value to prevent Null Primary Key
 
     private String strMeal;
     private String strMealThumb;
@@ -25,23 +32,17 @@ public class MealRoomDTO {
     private String strInstructions;
     private String strYoutube;
 
-    // The lists from MealDTO
     private List<String> ingredients;
     private List<String> measures;
 
-    private String date;
     private boolean isFavorite;
+    private String firebaseKey;
 
+    // Required Empty Constructor for Firebase and Room
     public MealRoomDTO() {}
 
-    // --- New Getters and Setters for Lists ---
-    public List<String> getIngredients() { return ingredients; }
-    public void setIngredients(List<String> ingredients) { this.ingredients = ingredients; }
+    // --- Getters and Setters ---
 
-    public List<String> getMeasures() { return measures; }
-    public void setMeasures(List<String> measures) { this.measures = measures; }
-
-    // --- Existing Getters and Setters ---
     @NonNull
     public String getIdMeal() { return idMeal; }
     public void setIdMeal(@NonNull String idMeal) { this.idMeal = idMeal; }
@@ -49,6 +50,18 @@ public class MealRoomDTO {
     @NonNull
     public String getUserEmail() { return userEmail; }
     public void setUserEmail(@NonNull String userEmail) { this.userEmail = userEmail; }
+
+    @NonNull
+    public String getDate() {
+        return (date == null || date.isEmpty()) ? "favorite" : date;
+    }
+    public void setDate(@NonNull String date) {
+        if (date == null || date.isEmpty()) {
+            this.date = "favorite";
+        } else {
+            this.date = date;
+        }
+    }
 
     public String getStrMeal() { return strMeal; }
     public void setStrMeal(String strMeal) { this.strMeal = strMeal; }
@@ -68,9 +81,15 @@ public class MealRoomDTO {
     public String getStrYoutube() { return strYoutube; }
     public void setStrYoutube(String strYoutube) { this.strYoutube = strYoutube; }
 
-    public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public List<String> getIngredients() { return ingredients; }
+    public void setIngredients(List<String> ingredients) { this.ingredients = ingredients; }
+
+    public List<String> getMeasures() { return measures; }
+    public void setMeasures(List<String> measures) { this.measures = measures; }
 
     public boolean isFavorite() { return isFavorite; }
     public void setFavorite(boolean favorite) { isFavorite = favorite; }
+
+    public String getFirebaseKey() { return firebaseKey; }
+    public void setFirebaseKey(String firebaseKey) { this.firebaseKey = firebaseKey; }
 }

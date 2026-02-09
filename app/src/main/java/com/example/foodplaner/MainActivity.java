@@ -16,6 +16,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNav;
@@ -54,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        //sync with firebase store
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
     }
 }

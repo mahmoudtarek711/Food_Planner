@@ -82,4 +82,7 @@ dependencies {
 
     // Testing Room (optional)
     testImplementation "androidx.room:room-testing:$room_version"
+
+    //firebase database
+    implementation("com.google.firebase:firebase-database:21.0.0")
 }
