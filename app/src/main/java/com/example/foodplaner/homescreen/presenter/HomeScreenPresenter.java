@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class HomeScreenPresenter implements PresenterInterface {
+    private static final long REFRESH_INTERVAL = 60000;
     ViewInterface view;
     RepositoryImp repository;
     AuthRepository AuthRepository;
@@ -136,5 +137,42 @@ public class HomeScreenPresenter implements PresenterInterface {
 
     public void clearResources() {
         disposables.clear();
+    }
+    @Override
+    public void requestRandomMeal(android.content.SharedPreferences prefs) {
+        long lastFetchTime = prefs.getLong("last_fetch_time", 0);
+        long currentTime = System.currentTimeMillis();
+        String cachedMealJson = prefs.getString("meal_of_the_day", null);
+
+        // 1. Check if the time has expired OR we don't have a meal saved yet
+        if (currentTime - lastFetchTime > REFRESH_INTERVAL || cachedMealJson == null) {
+            fetchNewRandomMealFromNetwork(prefs);
+        } else {
+            // 2. Load from SharedPreferences
+            com.google.gson.Gson gson = new com.google.gson.Gson();
+            MealDTO meal = gson.fromJson(cachedMealJson, MealDTO.class);
+            view.displayRandomMeal(meal);
+        }
+    }
+
+    private void fetchNewRandomMealFromNetwork(android.content.SharedPreferences prefs) {
+        disposables.add(
+                repository.getRandomMeal()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                meal -> {
+                                    // 3. Save the new meal and the current time
+                                    com.google.gson.Gson gson = new com.google.gson.Gson();
+                                    prefs.edit()
+                                            .putString("meal_of_the_day", gson.toJson(meal))
+                                            .putLong("last_fetch_time", System.currentTimeMillis())
+                                            .apply();
+
+                                    view.displayRandomMeal(meal);
+                                },
+                                error -> view.showError("Network Error: " + error.getMessage())
+                        )
+        );
     }
 }

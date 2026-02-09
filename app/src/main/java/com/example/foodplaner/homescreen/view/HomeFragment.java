@@ -78,14 +78,12 @@ public class HomeFragment extends Fragment implements ViewInterface {
         initViews(view);
         setupPresenter();
 
-        // Setup persistent Snackbar
         connectivitySnackbar = Snackbar.make(view, "No Internet Connection", Snackbar.LENGTH_INDEFINITE);
 
-        // Initial Logic flow
         if (isNetworkAvailable()) {
             wasOffline = false;
             if (connectivitySnackbar.isShown()) connectivitySnackbar.dismiss();
-            handleDataLoading(savedInstanceState);
+            handleDataLoading(savedInstanceState); // This now handles EVERYTHING
         } else {
             wasOffline = true;
             connectivitySnackbar.show();
@@ -94,6 +92,20 @@ public class HomeFragment extends Fragment implements ViewInterface {
 
         setupNetworkListener();
         setupUserData(view);
+
+        // Setup the testing long-click here
+        mealImg.setOnLongClickListener(v -> {
+            android.content.SharedPreferences prefs = requireContext()
+                    .getSharedPreferences("MealPrefs", android.content.Context.MODE_PRIVATE);
+
+            prefs.edit().clear().apply(); // Clear timer
+            presenter.logoutUser(); // This is a trick to clear the static cachedRandomMeal in your presenter
+            // Or better yet, call your request method again
+            presenter.requestRandomMeal(prefs);
+
+            Toast.makeText(getContext(), "Test: Memory cleared. Fetching new meal...", Toast.LENGTH_SHORT).show();
+            return true;
+        });
     }
 
     private void initViews(View view) {
@@ -122,45 +134,22 @@ public class HomeFragment extends Fragment implements ViewInterface {
     }
 
     private void handleDataLoading(Bundle savedInstanceState) {
-        // 1. Restore from fragment memory (backstack navigation)
-        if (mealList != null && randomMeal != null) {
+        android.content.SharedPreferences prefs = requireContext()
+                .getSharedPreferences("MealPrefs", android.content.Context.MODE_PRIVATE);
+
+        // 1. Handle List of 10 Meals
+        if (mealList != null) {
             displayAllMeals(mealList);
-            displayRandomMeal(randomMeal);
-            onProcessingEnd(); // CRITICAL: Explicitly hide loading when restoring from memory
-            presenter.getFavoriteMeals(); // Always refresh favorites
-            return;
-        }
-
-        // 2. Restore from system bundle (process kill/rotation)
-        if (savedInstanceState != null) {
+        } else if (savedInstanceState != null && savedInstanceState.containsKey("MEALS_LIST")) {
             mealList = savedInstanceState.getParcelableArrayList("MEALS_LIST");
-            randomMeal = savedInstanceState.getParcelable("RANDOM_MEAL");
-
-            boolean hasData = true;
-
-            if (mealList != null) {
-                displayAllMeals(mealList);
-            } else {
-                presenter.getAllMeals(false);
-                hasData = false;
-            }
-
-            if (randomMeal != null) {
-                displayRandomMeal(randomMeal);
-            } else {
-                presenter.requestRandomMeal(false);
-                hasData = false;
-            }
-
-            if (hasData) {
-                onProcessingEnd(); // CRITICAL: Hide loading if bundle had everything
-            }
-        }
-        // 3. Fresh Start
-        else {
+            displayAllMeals(mealList);
+        } else {
             presenter.getAllMeals(false);
-            presenter.requestRandomMeal(false);
         }
+
+        // 2. Handle Meal of the Day (Timer Logic)
+        // One call to rule them all.
+        presenter.requestRandomMeal(prefs);
 
         presenter.getFavoriteMeals();
         syncFirebaseData();
