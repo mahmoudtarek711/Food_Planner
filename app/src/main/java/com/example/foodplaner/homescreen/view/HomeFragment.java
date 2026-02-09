@@ -106,6 +106,7 @@ public class HomeFragment extends Fragment implements ViewInterface {
             Toast.makeText(getContext(), "Test: Memory cleared. Fetching new meal...", Toast.LENGTH_SHORT).show();
             return true;
         });
+        mealImg.setOnClickListener(v -> presenter.navigateToMealDetails(randomMeal));
     }
 
     private void initViews(View view) {
@@ -137,23 +138,35 @@ public class HomeFragment extends Fragment implements ViewInterface {
         android.content.SharedPreferences prefs = requireContext()
                 .getSharedPreferences("MealPrefs", android.content.Context.MODE_PRIVATE);
 
-        // 1. Handle List of 10 Meals
-        if (mealList != null) {
+        // 1. Check if we already have data in memory (Restoring from backstack)
+        if (mealList != null && randomMeal != null) {
             displayAllMeals(mealList);
-        } else if (savedInstanceState != null && savedInstanceState.containsKey("MEALS_LIST")) {
-            mealList = savedInstanceState.getParcelableArrayList("MEALS_LIST");
-            displayAllMeals(mealList);
-        } else {
-            presenter.getAllMeals(false);
+            displayRandomMeal(randomMeal);
+            onProcessingEnd(); // Ensure progress bar is hidden
+            presenter.getFavoriteMeals();
+            return; // STOP HERE - don't trigger more network/loading calls
         }
 
-        // 2. Handle Meal of the Day (Timer Logic)
-        // One call to rule them all.
-        presenter.requestRandomMeal(prefs);
+        // 2. Handle System-level restoration (Bundle)
+        if (savedInstanceState != null && savedInstanceState.containsKey("MEALS_LIST")) {
+            mealList = savedInstanceState.getParcelableArrayList("MEALS_LIST");
+            randomMeal = savedInstanceState.getParcelable("RANDOM_MEAL");
+
+            if (mealList != null) displayAllMeals(mealList);
+            if (randomMeal != null) displayRandomMeal(randomMeal);
+
+            onProcessingEnd();
+        }
+        // 3. Fresh Start logic
+        else {
+            presenter.getAllMeals(false);
+            presenter.requestRandomMeal(prefs);
+        }
 
         presenter.getFavoriteMeals();
         syncFirebaseData();
     }
+
 
     private void setupUserData(View view) {
         TextView welcomeText = view.findViewById(R.id.client_name_home_text);
@@ -275,8 +288,8 @@ public class HomeFragment extends Fragment implements ViewInterface {
 
     @Override
     public void onProcessingEnd() {
-        progressBar.setVisibility(View.GONE);
-        contentLayout.setVisibility(View.VISIBLE);
+        if (progressBar != null) progressBar.setVisibility(View.GONE);
+        if (contentLayout != null) contentLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
