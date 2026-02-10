@@ -3,7 +3,7 @@ package com.example.foodplaner.detailscreen.presenter;
 import com.example.foodplaner.detailscreen.view.MealDetailsViewInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.model.MealRoomDTO;
-import com.example.foodplaner.repository.LocalRepositoryInterface;
+import com.example.foodplaner.datasource.localdatasource.LocalRepositoryInterface;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -96,10 +96,7 @@ public class MealDetailsPresenter implements MealDetailsPresenterInterface {
 
     @Override
     public void removeFromCalendar(MealDTO meal) {
-        // Note: Details screen usually doesn't know 'which' date to remove
-        // if the meal is scheduled multiple times.
-        // This usually happens inside CalendarFragment/Presenter.
-        // If needed here, you would need to pass the date string to this method.
+
         view.showMessage("Please remove meals via the Calendar screen");
     }
 

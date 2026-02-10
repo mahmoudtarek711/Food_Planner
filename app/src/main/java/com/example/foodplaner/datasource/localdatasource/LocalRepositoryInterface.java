@@ -1,4 +1,4 @@
-package com.example.foodplaner.repository;
+package com.example.foodplaner.datasource.localdatasource;
 
 
 import com.example.foodplaner.model.MealRoomDTO;

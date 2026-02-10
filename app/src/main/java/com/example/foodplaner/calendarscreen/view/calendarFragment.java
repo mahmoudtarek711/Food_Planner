@@ -18,7 +18,7 @@ import com.example.foodplaner.R;
 import com.example.foodplaner.calendarscreen.presenter.CalendarPresenter;
 import com.example.foodplaner.model.DayModel;
 import com.example.foodplaner.model.MealRoomDTO;
-import com.example.foodplaner.repository.LocalRepositoryImp;
+import com.example.foodplaner.datasource.localdatasource.LocalRepositoryImp;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

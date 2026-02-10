@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.foodplaner.calendarscreen.view.CalendarViewInterface;
 import com.example.foodplaner.model.MealRoomDTO;
-import com.example.foodplaner.repository.LocalRepositoryInterface;
+import com.example.foodplaner.datasource.localdatasource.LocalRepositoryInterface;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;

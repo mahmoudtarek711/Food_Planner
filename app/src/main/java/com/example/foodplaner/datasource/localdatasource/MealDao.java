@@ -1,4 +1,4 @@
-package com.example.foodplaner.db;
+package com.example.foodplaner.datasource.localdatasource;
 
 import androidx.room.Dao;
 import androidx.room.Delete;

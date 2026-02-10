@@ -1,10 +1,9 @@
-package com.example.foodplaner.repository;
+package com.example.foodplaner.datasource.localdatasource;
 
 import android.content.Context;
 import com.example.foodplaner.db.AppDatabase;
-import com.example.foodplaner.db.MealDao;
 import com.example.foodplaner.model.MealRoomDTO;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.foodplaner.repository.FirebaseRepository;
 
 import java.util.List;
 import io.reactivex.rxjava3.core.Completable;

@@ -7,6 +7,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.example.foodplaner.datasource.localdatasource.MealDao;
 import com.example.foodplaner.model.MealRoomDTO;
 
 // 1. Define the entities and version

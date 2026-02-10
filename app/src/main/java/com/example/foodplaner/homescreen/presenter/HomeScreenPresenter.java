@@ -5,7 +5,7 @@ import com.example.foodplaner.homescreen.view.ViewInterface;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.model.MealRoomDTO;
 import com.example.foodplaner.repository.AuthRepository;
-import com.example.foodplaner.repository.LocalRepositoryInterface;
+import com.example.foodplaner.datasource.localdatasource.LocalRepositoryInterface;
 import com.example.foodplaner.repository.RepositoryImp;
 
 import java.util.ArrayList;

@@ -23,7 +23,7 @@ import com.bumptech.glide.Glide;
 import com.example.foodplaner.R;
 import com.example.foodplaner.detailscreen.presenter.MealDetailsPresenter;
 import com.example.foodplaner.model.MealDTO;
-import com.example.foodplaner.repository.LocalRepositoryImp;
+import com.example.foodplaner.datasource.localdatasource.LocalRepositoryImp;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
