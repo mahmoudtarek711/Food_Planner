@@ -125,7 +125,8 @@ public class HomeFragment extends Fragment implements ViewInterface {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         includeView.setOnClickListener(v -> presenter.navigateToMealDetails(randomMeal));
-        logout.setOnClickListener(v -> presenter.logoutUser());
+        logout.setOnClickListener(v -> {presenter.logoutUser();
+            Snackbar.make(this.getView(), "Logged Out Successfully", Snackbar.LENGTH_SHORT).show();});
     }
 
     private void setupPresenter() {
