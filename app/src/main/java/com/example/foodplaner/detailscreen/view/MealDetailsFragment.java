@@ -31,7 +31,9 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -215,23 +217,30 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
     }
 
     private void showDatePicker() {
-
         Calendar calendar = Calendar.getInstance();
-
         DatePickerDialog dialog = new DatePickerDialog(
                 requireContext(),
                 (view, year, month, dayOfMonth) -> {
+                    // Use a Calendar instance to format consistently
+                    Calendar selectedCal = Calendar.getInstance();
+                    selectedCal.set(year, month, dayOfMonth);
 
-                    String date = year + "-" + (month+1) + "-" + dayOfMonth;
+                    // Matches the "yyyy-M-d" format used in calendarFragment
+                    SimpleDateFormat dbFmt = new SimpleDateFormat("yyyy-M-d", Locale.ENGLISH);
+                    String date = dbFmt.format(selectedCal.getTime());
 
                     presenter.addToCalendar(meal, date);
-
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
-        dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+
+        // Limits selection to 7 days as requested previously
+        long now = System.currentTimeMillis();
+        dialog.getDatePicker().setMinDate(now);
+        dialog.getDatePicker().setMaxDate(now + (1000 * 60 * 60 * 24 * 7));
+
         dialog.show();
     }
 
