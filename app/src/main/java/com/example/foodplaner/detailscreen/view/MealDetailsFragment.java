@@ -25,6 +25,7 @@ import com.example.foodplaner.detailscreen.presenter.MealDetailsPresenter;
 import com.example.foodplaner.model.MealDTO;
 import com.example.foodplaner.datasource.localdatasource.LocalRepositoryImp;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
@@ -139,9 +140,11 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
             add_to_favorites.setOnClickListener(v -> {
                 if (isFavorite) {
                     presenter.removeFromFavorite(meal);
-                    // Note: onFavoriteStatusChanged will handle the UI update via the presenter
+                    Snackbar.make(this.getView(), meal.getStrMeal()+" Removed Favorites", Snackbar.LENGTH_SHORT).show();
                 } else {
                     presenter.addToFavorite(meal);
+
+                    Snackbar.make(this.getView(), meal.getStrMeal()+" Added to Favorites", Snackbar.LENGTH_SHORT).show();
                 }
             });
 
@@ -230,6 +233,7 @@ public class MealDetailsFragment extends Fragment implements MealDetailsViewInte
                     String date = dbFmt.format(selectedCal.getTime());
 
                     presenter.addToCalendar(meal, date);
+                    Snackbar.make(this.getView(), meal.getStrMeal()+" Added to Calendar"+date, Snackbar.LENGTH_SHORT).show();
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),

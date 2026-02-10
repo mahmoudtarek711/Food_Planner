@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.foodplaner.R;
 import com.example.foodplaner.model.MealRoomDTO;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.List;
 
 public class PlannedMealsAdapter extends RecyclerView.Adapter<PlannedMealsAdapter.ViewHolder> {
@@ -47,7 +49,10 @@ public class PlannedMealsAdapter extends RecyclerView.Adapter<PlannedMealsAdapte
         holder.tvOrigin.setText(meal.getStrArea());
         Glide.with(holder.itemView.getContext()).load(meal.getStrMealThumb()).into(holder.ivMeal);
 
-        holder.btnRemove.setOnClickListener(v -> listener.onRemoveClick(meal));
+        holder.btnRemove.setOnClickListener(
+                v -> {listener.onRemoveClick(meal);
+                    Snackbar.make(v, meal.getStrMeal()+" removed", Snackbar.LENGTH_SHORT).show();
+                });
     }
 
     @Override
